@@ -22,24 +22,64 @@
       width: 100%;
     }
 
-    body {
-      background: #f4fdf4;
-    }
+body {
+  background: url('images/web_bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #e6f4e6; /* light desaturated green-white */
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+}
 
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(1, 26, 1, 0.568); /* dark green matte overlay */
+  z-index: -1;
+}
+
+header {
+  background: transparent;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+
+<<<<<<< Updated upstream
     header {
       background-color: #198754;
       position: fixed; 
       width: 100%;      
       z-index: 1;
     }
+=======
+>>>>>>> Stashed changes
 
     footer {
       background-color: #198754;
     }
+    .glass-card {
+  background: rgba(255, 255, 255, 0.07); /* semi-transparent white */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #e0f2e0;
+  height: 160px; /* Set your desired fixed height */
+}
 
+<<<<<<< Updated upstream
     .card {
       margin-bottom: 1rem;
     }
+=======
+
+
+   
+>>>>>>> Stashed changes
     .card h5 {
       font-weight: 600;
     }
@@ -56,12 +96,32 @@
       margin: 0 5px;
       
     }
+
+.matte-text {
+  color: rgba(255, 255, 255, 0.85); /* soft white */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* slight shadow for contrast */
+  font-weight: 600;
+  filter: brightness(1); /* slightly dims for a matte feel */
+}
+.matte-sub-head{
+    color: rgba(255, 255, 255, 0.85); /* soft white */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* slight shadow for contrast */
+
+  filter: brightness(1); /* slightly dims for a matte feel */
+}
+
+
   </style>
 </head>
 <body>
 <header>
+<<<<<<< Updated upstream
   <nav class="navbar navbar-expand-lg navbar-light bg-success px-4 py-2">
     <a class="navbar-brand fw-bold fs-5 text-white" href="index.html">Sprout Scout</a>
+=======
+  <nav class="navbar navbar-expand-lg navbar-light px-4 py-2" style="background-color: rgba(61, 100, 77, 0); ;">
+    <a class="navbar-brand fw-bold fs-5 text-white no-hover" href="index.html">🌱 Sprout Scout</a>
+>>>>>>> Stashed changes
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -85,29 +145,47 @@
 
   
   <div class="container py-4">
+<<<<<<< Updated upstream
     <h2 class="text-center mb-4 mt-5">Spider Plant Monitoring Dashboard</h2>
+=======
+<h2 class="text-center mb-4 mt-5 display-5 matte-text">
+  Spider Plant Monitoring Dashboard
+</h2>
+
+>>>>>>> Stashed changes
 
 
     <!-- Calculated Values FIRST -->
-    <h4 class="mt-4 mb-3" id="metrics">📈 Calculated Plant Metrics</h4>
+    <h4 class="mt-4 mb-3 matte-sub-head" id="metrics">Calculated Plant Metrics</h4>
     <div class="row mt-4">
+<<<<<<< Updated upstream
     <div class="col-md-4">
         <div class="card shadow">
         <div class="card-body">
+=======
+    <div class="col-md-4 ">
+        <div class="card shadow glass-card">
+        <div class="card-body ">
+>>>>>>> Stashed changes
             <h5 class="d-flex justify-content-between align-items-center">
-            <span>⚡ Plant Stress</span>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Shows environmental stress signals" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
+            <span>Plant Stress</span>
+            <span tabindex="0" data-bs-toggle="tooltip" title="Shows environmental stress signals" style="cursor: pointer;">
+  <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
+</span>
+
             </h5>
             <p id="stress">Analyzing...</p>
         </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow text-center">
+        <div class="card shadow glass-card">
         <div class="card-body">
             <h5 class="d-flex justify-content-between align-items-center">
             <span>🔢 Health Index Score</span>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Overall condition score (0–100)" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
+            <span tabindex="0" data-bs-toggle="tooltip" title="Overall condition score (0–100)" style="cursor: pointer; ">
+  <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
+</span>
             </h5>
             <div class="score-box" id="healthIndex">--</div>
         </div>
@@ -119,16 +197,16 @@
     <h4 class="mt-5 mb-3" id="readings">🌡️ Live Sensor Readings</h4>
     <div class="row text-center mt-4">
     <div class="col-md-3">
-        <div class="card shadow">
+        <div class="card shadow glass-card">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Soil Moisture</h5>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal range: 50–75%" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
+            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal range: 50–75%" style="cursor: pointer;">ℹ️</span>
         </div>
         <h2 id="moisture">--%</h2>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow">
+        <div class="card shadow glass-card">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Light Level</h5>
             <span tabindex="0" data-bs-toggle="tooltip" title="Light intensity in lux (ideal: 600–900)" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
@@ -137,7 +215,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow">
+        <div class="card shadow glass-card">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Temperature</h5>
             <span tabindex="0" data-bs-toggle="tooltip" title="Ideal temp: 22–30°C" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
@@ -146,7 +224,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card shadow">
+        <div class="card shadow glass-card">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Humidity</h5>
             <span tabindex="0" data-bs-toggle="tooltip" title="Humidity comfort zone: 60–80%" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
@@ -225,40 +303,45 @@
   let currentPage = 1;
   let allData = [];
 
-  function getSensorData() {
-    return {
-      temp: 24 + Math.random() * 6,
-      humidity: 60 + Math.random() * 20,
-      light: 400 + Math.random() * 500,
-      moisture: 40 + Math.random() * 30,
-      time: new Date().toLocaleTimeString(),
-    };
-  }
+function getSensorData() {
+  return {
+    temp: 15 + Math.random() * 25,           // 15 to 40 °C
+    humidity: 30 + Math.random() * 60,       // 30 to 90%
+    light: 200 + Math.random() * 800,        // 200 to 1000 lux
+    moisture: 20 + Math.random() * 80,       // 20 to 100%
+    time: new Date().toLocaleTimeString(),
+  };
+}
 
-  function calculateForecast(data) {
-    const L = Math.min(data.light, 800);
-    const M = Math.min(data.moisture, 75);
-    const D = Math.min(daysSincePlanting, 85);
+function calculateForecast(data) {
+  const stress = [];
 
-    const stress = [];
-    if (data.temp > 32) stress.push("🔥 High Temp");
-    if (data.temp < 20) stress.push("❄️ Low Temp");
-    if (data.moisture < 40) stress.push("🌵 Dry Soil");
-    if (data.moisture > 80) stress.push("💧 Overwatering");
-    if (data.light < 500) stress.push("🌥️ Low Light");
-    const stressText = stress.length ? stress.join(", ") : "✅ No visible stress";
+  if (data.temp > 32)
+    stress.push(`<img src="https://img.icons8.com/glassmorphism/48/hot.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=High Temp"/> High Temp`);
+  if (data.temp < 20)
+    stress.push(`<img src="https://img.icons8.com/glassmorphism/48/cold.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Temp"/> Low Temp`);
+  if (data.moisture < 40)
+    stress.push(`<img src="https://img.icons8.com/glassmorphism/48/ground.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Dry Soil"/> Dry Soil`);
+  if (data.moisture > 80)
+    stress.push(`<img src="https://img.icons8.com/glassmorphism/48/soil.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Overwatering"/> Overwatering`);
+  if (data.light < 500)
+    stress.push(`<img src="https://img.icons8.com/glassmorphism/48/clouds.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Light"/> Low Light`);
 
-    const tempScore = data.temp >= 22 && data.temp <= 30 ? 1 : 0;
-    const humidityScore = data.humidity >= 60 && data.humidity <= 80 ? 1 : 0;
-    const moistureScore = data.moisture >= 50 && data.moisture <= 75 ? 1 : 0;
-    const lightScore = data.light >= 600 && data.light <= 900 ? 1 : 0;
-    const healthIndex = ((tempScore + humidityScore + moistureScore + lightScore) / 4) * 100;
+  const stressText = stress.length
+    ? stress.join("<br>")
+    : `<em>No visible stress</em>`;
 
-    return {
-      stressText,
-      healthIndex: healthIndex.toFixed(0),
-    };
-  }
+  const tempScore = data.temp >= 22 && data.temp <= 30 ? 1 : 0;
+  const humidityScore = data.humidity >= 60 && data.humidity <= 80 ? 1 : 0;
+  const moistureScore = data.moisture >= 50 && data.moisture <= 75 ? 1 : 0;
+  const lightScore = data.light >= 600 && data.light <= 900 ? 1 : 0;
+  const healthIndex = ((tempScore + humidityScore + moistureScore + lightScore) / 4) * 100;
+
+  return {
+    stressText,
+    healthIndex: healthIndex.toFixed(0),
+  };
+}
 
   const ctx = document.getElementById("sensorChart").getContext("2d");
   const chart = new Chart(ctx, {
@@ -330,7 +413,7 @@ function updateDashboard() {
   humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
   lightEl.textContent = `${data.light.toFixed(0)} lux`;
   moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
-  stressEl.textContent = calculated.stressText;
+  stressEl.innerHTML = calculated.stressText;
   healthIndexEl.textContent = `${calculated.healthIndex} / 100`;
 
   // Store & chart
