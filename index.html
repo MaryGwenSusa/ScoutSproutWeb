@@ -47,15 +47,29 @@ header {
   z-index: 10;
 }
 
-<<<<<<< Updated upstream
-    header {
-      background-color: #198754;
-      position: fixed; 
-      width: 100%;      
-      z-index: 1;
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(1, 26, 1, 0.568); /* dark green matte overlay */
+  z-index: -1;
+}
+
+header {
+  background: transparent;
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+
+
+    .no-hover:hover{
+      text-decoration: none;
     }
-=======
->>>>>>> Stashed changes
+
 
     footer {
       background-color: #198754;
@@ -71,15 +85,10 @@ header {
   height: 160px; /* Set your desired fixed height */
 }
 
-<<<<<<< Updated upstream
-    .card {
-      margin-bottom: 1rem;
-    }
-=======
 
 
-   
->>>>>>> Stashed changes
+
+
     .card h5 {
       font-weight: 600;
     }
@@ -115,13 +124,10 @@ header {
 </head>
 <body>
 <header>
-<<<<<<< Updated upstream
+
   <nav class="navbar navbar-expand-lg navbar-light bg-success px-4 py-2">
     <a class="navbar-brand fw-bold fs-5 text-white" href="index.html">Sprout Scout</a>
-=======
-  <nav class="navbar navbar-expand-lg navbar-light px-4 py-2" style="background-color: rgba(61, 100, 77, 0); ;">
-    <a class="navbar-brand fw-bold fs-5 text-white no-hover" href="index.html">🌱 Sprout Scout</a>
->>>>>>> Stashed changes
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -145,28 +151,18 @@ header {
 
   
   <div class="container py-4">
-<<<<<<< Updated upstream
-    <h2 class="text-center mb-4 mt-5">Spider Plant Monitoring Dashboard</h2>
-=======
 <h2 class="text-center mb-4 mt-5 display-5 matte-text">
   Spider Plant Monitoring Dashboard
 </h2>
 
->>>>>>> Stashed changes
-
-
     <!-- Calculated Values FIRST -->
     <h4 class="mt-4 mb-3 matte-sub-head" id="metrics">Calculated Plant Metrics</h4>
     <div class="row mt-4">
-<<<<<<< Updated upstream
-    <div class="col-md-4">
-        <div class="card shadow">
-        <div class="card-body">
-=======
+
     <div class="col-md-4 ">
         <div class="card shadow glass-card">
         <div class="card-body ">
->>>>>>> Stashed changes
+
             <h5 class="d-flex justify-content-between align-items-center">
             <span>Plant Stress</span>
             <span tabindex="0" data-bs-toggle="tooltip" title="Shows environmental stress signals" style="cursor: pointer;">
