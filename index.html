@@ -6,6 +6,7 @@
   <title>Spider Plant Monitoring Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="icon" href="plant.png" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
@@ -18,6 +19,10 @@
       scroll-behavior: smooth;
     }
 
+    a:hover, a:active {
+      text-decoration: underline;
+    }
+
     img {
       width: 100%;
     }
@@ -27,10 +32,15 @@
     }
 
     header {
-      background-color: #198754;
+      background: #57C785;
+      background: radial-gradient(circle,rgba(87, 199, 133, 1) 0%, rgba(25, 135, 84, 1) 100%);
       position: fixed; 
       width: 100%;      
       z-index: 1;
+    }
+
+    .no-hover:hover{
+      text-decoration: none;
     }
 
     footer {
@@ -60,8 +70,8 @@
 </head>
 <body>
 <header>
-  <nav class="navbar navbar-expand-lg navbar-light bg-success px-4 py-2">
-    <a class="navbar-brand fw-bold fs-5 text-white" href="index.html">Sprout Scout</a>
+  <nav class="navbar navbar-expand-lg navbar-light bg-success mx-2 py-2">
+    <a class="no-hover navbar-brand fw-bold fs-5 text-white" href="index.html">Sprout Scout</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -85,12 +95,38 @@
 
   
   <div class="container py-4">
-    <h2 class="text-center mb-4 mt-5">Spider Plant Monitoring Dashboard</h2>
-
+    <h2 class="text-center mb-4 mt-5 fw-bold">🪴Spider Plant Monitoring Dashboard🪴</h2>
+    <div class="mb-3 text-center">
+    <label for="plantingDate" class="form-label">📅 Enter Planting Date:</label>
+    <input type="date" id="plantingDate" class="form-control d-inline-block w-auto" />
+    <button class="btn btn-sm btn-success ms-2" onclick="savePlantingDate()">Save Date</button>
+    <p id="daysSinceText" class="mt-2 text-muted"></p>
+    </div >
 
     <!-- Calculated Values FIRST -->
     <h4 class="mt-4 mb-3" id="metrics">📈 Calculated Plant Metrics</h4>
     <div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card shadow">
+        <div class="card-body">
+            <h5>
+                Ripeness Forecast 
+                <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" 
+                    title="Estimates how close the fruit is to harvestable ripeness.<br><br>
+                            <strong>Ripeness Forecast is based on:</strong><br>
+                            • Light: 800 lux = optimal indoor light<br>
+                            • Moisture: 75% = ideal soil moisture for ripening<br>
+                            • Days: 85 = typical ripening time for tomatoes<br><br>
+                            The closer your conditions are to these values, the more ripe your tomatoes are likely to be."
+                    style="cursor: pointer; color: #0d6efd;">
+                    ℹ️
+                </span>
+            </h5>
+
+            <p id="ripeness">Calculating...</p>
+        </div>
+        </div>
+    </div>
     <div class="col-md-4">
         <div class="card shadow">
         <div class="card-body">
@@ -119,10 +155,10 @@
     <h4 class="mt-5 mb-3" id="readings">🌡️ Live Sensor Readings</h4>
     <div class="row text-center mt-4">
     <div class="col-md-3">
-        <div class="card shadow">
+        <div class="card shadow m">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Soil Moisture</h5>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal range: 50–75%" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
+            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal Range: 50–75%" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
         </div>
         <h2 id="moisture">--%</h2>
         </div>
@@ -131,7 +167,7 @@
         <div class="card shadow">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Light Level</h5>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Light intensity in lux (ideal: 600–900)" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
+            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal Range: 600–900 lux" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
         </div>
         <h2 id="light">-- lux</h2>
         </div>
@@ -140,7 +176,7 @@
         <div class="card shadow">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Temperature</h5>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal temp: 22–30°C" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
+            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal Temperature: 22–30°C" style="cursor: pointer; color: #0d6efd;">ℹ️</span>
         </div>
         <h2 id="temp">--°C</h2>
         </div>
@@ -184,6 +220,7 @@
                     <th>Humidity (%)</th>
                     <th>Light (lux)</th>
                     <th>Moisture (%)</th>
+                    <th>Ripeness Forecast</th>
                     <th>Plant Stress</th>
                     <th>Health Index</th>
                   </tr>
@@ -212,6 +249,7 @@
   const humidityEl = document.getElementById("humidity");
   const lightEl = document.getElementById("light");
   const moistureEl = document.getElementById("moisture");
+  const ripenessEl = document.getElementById("ripeness");
   const stressEl = document.getElementById("stress");
   const healthIndexEl = document.getElementById("healthIndex");
 
@@ -239,6 +277,13 @@
     const L = Math.min(data.light, 800);
     const M = Math.min(data.moisture, 75);
     const D = Math.min(daysSincePlanting, 85);
+    const ripenessScore = (L / 800) * (M / 75) * (D / 85);
+    const percent = (ripenessScore * 100).toFixed(0);
+
+    let ripenessText = "🌱 Early stage";
+    if (ripenessScore >= 0.8) ripenessText = `🍅 Likely ripe (${percent}%)`;
+    else if (ripenessScore >= 0.5) ripenessText = `⏳ Mid-ripeness (${percent}%)`;
+    else ripenessText = `🌱 Early stage (${percent}%)`;
 
     const stress = [];
     if (data.temp > 32) stress.push("🔥 High Temp");
@@ -255,6 +300,7 @@
     const healthIndex = ((tempScore + humidityScore + moistureScore + lightScore) / 4) * 100;
 
     return {
+      ripenessText,
       stressText,
       healthIndex: healthIndex.toFixed(0),
     };
@@ -295,6 +341,7 @@
         <td>${entry.humidity.toFixed(1)}</td>
         <td>${entry.light.toFixed(0)}</td>
         <td>${entry.moisture.toFixed(0)}</td>
+        <td>${entry.ripenessText}</td>
         <td>${entry.stressText}</td>
         <td>${entry.healthIndex}</td>
       `;
@@ -321,44 +368,81 @@
     }
   });
 
-function updateDashboard() {
-  const data = getSensorData();
-  const calculated = calculateForecast(data);
+  function updateDashboard() {
+    if (daysSincePlanting === null) {
+        ripenessEl.textContent = "⚠️ Please enter planting date to see forecast.";
+        stressEl.textContent = "--";
+        healthIndexEl.textContent = "--";
+        tempEl.textContent = "--";
+        humidityEl.textContent = "--";
+        lightEl.textContent = "--";
+        moistureEl.textContent = "--";
+        return; // Don't update further until planting date is set
+    }
 
-  // Update UI
-  tempEl.textContent = `${data.temp.toFixed(1)}°C`;
-  humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
-  lightEl.textContent = `${data.light.toFixed(0)} lux`;
-  moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
-  stressEl.textContent = calculated.stressText;
-  healthIndexEl.textContent = `${calculated.healthIndex} / 100`;
+    const data = getSensorData();
+    const calculated = calculateForecast(data);
 
-  // Store & chart
-  allData.push({
-    time: data.time,
-    ...data,
-    ...calculated,
-  });
+    // normal update with data...
+    tempEl.textContent = `${data.temp.toFixed(1)}°C`;
+    humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
+    lightEl.textContent = `${data.light.toFixed(0)} lux`;
+    moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
+    ripenessEl.textContent = calculated.ripenessText;
+    stressEl.textContent = calculated.stressText;
+    healthIndexEl.textContent = `${calculated.healthIndex} / 100`;
 
-  chart.data.labels.push(data.time);
-  chart.data.datasets[0].data.push(data.temp);
-  chart.data.datasets[1].data.push(data.humidity);
-  chart.data.datasets[2].data.push(data.light);
-  chart.data.datasets[3].data.push(data.moisture);
+    allData.push({
+      time: data.time,
+      ...data,
+      ...calculated,
+    });
 
-  if (chart.data.labels.length > 10) {
-    chart.data.labels.shift();
-    chart.data.datasets.forEach((ds) => ds.data.shift());
+    chart.data.labels.push(data.time);
+    chart.data.datasets[0].data.push(data.temp);
+    chart.data.datasets[1].data.push(data.humidity);
+    chart.data.datasets[2].data.push(data.light);
+    chart.data.datasets[3].data.push(data.moisture);
+    if (chart.data.labels.length > 10) {
+      chart.data.labels.shift();
+      chart.data.datasets.forEach((ds) => ds.data.shift());
+    }
+    chart.update();
+
+    currentPage = Math.ceil(allData.length / pageSize);
+    updateTablePage();
   }
 
-  chart.update();
+  function savePlantingDate() {
+    const dateInput = document.getElementById("plantingDate").value;
+    if (dateInput) {
+      localStorage.setItem("plantingDate", dateInput);
+      calculateDaysSincePlanting();
+    }
+  }
 
-  // Update table
-  currentPage = Math.ceil(allData.length / pageSize);
-  updateTablePage();
-}
+  // Also update calculateDaysSincePlanting to set daysSincePlanting to null if no date
+    function calculateDaysSincePlanting() {
+    const storedDate = localStorage.getItem("plantingDate");
+    const dateDisplay = document.getElementById("daysSinceText");
+
+    if (storedDate) {
+        document.getElementById("plantingDate").value = storedDate;
+
+        const start = new Date(storedDate);
+        const now = new Date();
+        const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+
+        daysSincePlanting = Math.max(0, diff);
+        dateDisplay.textContent = `🌱 Days since planting: ${daysSincePlanting}`;
+    } else {
+        daysSincePlanting = null;
+        dateDisplay.textContent = "⚠️ Please enter the planting date to enable forecast.";
+    }
+    }
 
   // Initial setup
+  calculateDaysSincePlanting();
   setInterval(updateDashboard, 5000);
   updateDashboard();
 
