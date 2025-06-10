@@ -63,7 +63,8 @@
     .score-box {
       font-size: 2rem;
       font-weight: bold;
-      color: #2e7d32;
+      color: #BEF992;
+      width: fit-content;
     }
     #pagination {
       margin-top: 10px;
@@ -136,7 +137,7 @@
           <div class="card shadow glass-card">
             <div class="card-body">
               <h5 class="d-flex justify-content-between align-items-center">
-              <span>🔢 Health Index Score</span>
+              <span>Health Index Score</span>
               <span tabindex="0" data-bs-toggle="tooltip" title="Overall condition score (0–100)" style="cursor: pointer; ">
                 <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
               </span>
@@ -247,11 +248,12 @@
   const moistureEl = document.getElementById("moisture");
   const stressEl = document.getElementById("stress");
   const healthIndexEl = document.getElementById("healthIndex");
-
   const dataTableBody = document.querySelector("#dataTable tbody");
   const prevPageBtn = document.getElementById("prevPage");
   const nextPageBtn = document.getElementById("nextPage");
   const pageInfo = document.getElementById("pageInfo");
+  const lowScoreIcon = 'images/unhealthy_plant.png';     // e.g. for 0 or 25
+  const highScoreIcon = 'images/healthy_plant.png';  // e.g. for 75 or 100
 
   let daysSincePlanting = null; // fallback default
   const pageSize = 10;
@@ -357,42 +359,62 @@ function calculateForecast(data) {
     }
   });
 
-function updateDashboard() {
-  const data = getSensorData();
-  const calculated = calculateForecast(data);
+  function updateDashboard() {
+    const data = getSensorData();
+    const calculated = calculateForecast(data);
 
-  // Update UI
-  tempEl.textContent = `${data.temp.toFixed(1)}°C`;
-  humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
-  lightEl.textContent = `${data.light.toFixed(0)} lux`;
-  moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
-  stressEl.innerHTML = calculated.stressText;
-  healthIndexEl.textContent = `${calculated.healthIndex} / 100`;
+    // Update UI
+    tempEl.textContent = `${data.temp.toFixed(1)}°C`;
+    humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
+    lightEl.textContent = `${data.light.toFixed(0)} lux`;
+    moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
+    stressEl.innerHTML = calculated.stressText;
 
-  // Store & chart
-  allData.push({
-    time: data.time,
-    ...data,
-    ...calculated,
-  });
+    // Determine icon based on score
+    const score = parseInt(calculated.healthIndex);
+    let iconUrl;
+    if (score === 0 || score === 25 || score === 50) {
+      iconUrl = lowScoreIcon;
+    } else if (score === 75 || score === 100) {
+      iconUrl = highScoreIcon;
+    } else {
+      iconUrl = '';
+    }
 
-  chart.data.labels.push(data.time);
-  chart.data.datasets[0].data.push(data.temp);
-  chart.data.datasets[1].data.push(data.humidity);
-  chart.data.datasets[2].data.push(data.light);
-  chart.data.datasets[3].data.push(data.moisture);
+    healthIndexEl.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <span>${score} / 100</span>
+        ${iconUrl
+          ? `<img src="${iconUrl}" alt="score icon" style="height:3em; width: 3em; margin-left: 3em; margin-top: -0.2em;" />`
+          : ''
+        }
+      </div>
+    `;
 
-  if (chart.data.labels.length > 10) {
-    chart.data.labels.shift();
-    chart.data.datasets.forEach((ds) => ds.data.shift());
+    // Store & chart
+    allData.push({
+      time: data.time,
+      ...data,
+      ...calculated,
+    });
+
+    chart.data.labels.push(data.time);
+    chart.data.datasets[0].data.push(data.temp);
+    chart.data.datasets[1].data.push(data.humidity);
+    chart.data.datasets[2].data.push(data.light);
+    chart.data.datasets[3].data.push(data.moisture);
+
+    if (chart.data.labels.length > 10) {
+      chart.data.labels.shift();
+      chart.data.datasets.forEach((ds) => ds.data.shift());
+    }
+
+    chart.update();
+
+    // Update table
+    currentPage = Math.ceil(allData.length / pageSize);
+    updateTablePage();
   }
-
-  chart.update();
-
-  // Update table
-  currentPage = Math.ceil(allData.length / pageSize);
-  updateTablePage();
-}
 
   // Initial setup
   setInterval(updateDashboard, 5000);
