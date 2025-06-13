@@ -48,7 +48,7 @@
     }
     .glass-card {
       background: rgba(255, 255, 255, 0.07); /* semi-transparent white */
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(10px);
       border: none;
       border-radius: 1rem;
@@ -128,6 +128,42 @@
     .plant-icon:hover {
       animation: wiggle 0.4s ease-in-out;
     }
+  .legend-boxes {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 1em;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    background-color:  rgba(255, 255, 255, 0.08);
+    transition: opacity 0.3s ease, transform 0.2s ease;
+  }
+
+  .legend-item:hover {
+    transform: scale(1.05);
+  }
+
+  .legend-item.inactive {
+    opacity: 0.4;
+  }
+
+  .legend-item .color-bar {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    display: inline-block;
+  }
 
   </style>
 </head>
@@ -156,13 +192,13 @@
 </header>
 
   <div class="container py-4">
-    <h2 class="text-center mb-4 mt-5 display-5 matte-text">
+    <h2 class="text-center mb-3 mt-5 display-5 matte-text">
       Spider Plant Monitoring Dashboard
     </h2>
 
     <!-- Calculated Values FIRST -->
-    <h4 class="mt-4 mb-3 matte-sub-head" id="metrics">Plant Status</h4>
-    <div class="row mt-4">
+    <h4 class="mt-1 mb-3 matte-sub-head" id="metrics">Plant Status</h4>
+    <div class="row mt-3">
       <div class="col-md-4 ">
         <div class="card shadow glass-card">
         <div class="card-body ">
@@ -193,8 +229,8 @@
     </div>
 
     <!-- Live Sensor Metrics AFTER -->
-    <h4 class="mt-5 mb-3 matte-sub-head" id="readings">Live Sensor Readings</h4>
-    <div class="row text-center mt-4">
+    <h4 class="mt-3 mb-3 matte-sub-head" id="readings">Live Sensor Readings</h4>
+    <div class="row text-center mt-3">
       <div class="col-md-3">
         <div class="card shadow glass-card">
         <div class="card-body ">
@@ -258,13 +294,40 @@
     </div>
   </div>
 
-  <!-- Sensor Trend Chart -->
-  <div class="card shadow mt-4">
-    <div class="card-body">
-      <h5 class="card-title" id="trends">Sensor Trends</h5>
-      <canvas id="sensorChart" height="100"></canvas>
-    </div>
+<!-- Sensor Trend Chart (Glass Styled) -->
+<div class="chart-card" style="width: 85%; margin: 0 auto; margin-top: 4em; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 1rem; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+  
+  <!-- Chart Canvas -->
+  <div style="position: relative; height: 450px;">
+    <canvas id="sensorChart"></canvas>
   </div>
+
+  <!-- Custom Legend -->
+  <div id="custom-legend" class="legend-boxes">
+    <span class="legend-item" data-index="0">
+      <span class="color-bar" style="background-color: #ff8a80;"></span>
+      Temp (°C)
+    </span>
+    <span class="legend-item" data-index="1">
+      <span class="color-bar" style="background-color: #82b1ff;"></span>
+      Humidity (%)
+    </span>
+    <span class="legend-item" data-index="2">
+      <span class="color-bar" style="background-color: #BED754;"></span>
+      Moisture (%)
+    </span>
+    <span class="legend-item" data-index="3">
+      <span class="color-bar" style="background-color: #FDFFAE;"></span>
+      Light (lux)
+    </span>
+  </div>
+</div>
+
+
+
+
+
+
 
   <!-- Collapsible Historical Data Table -->
   <div class="accordion mt-4" id="dataAccordion">
@@ -336,9 +399,22 @@
         humidity: 30 + Math.random() * 60,       // 30 to 90%
         light: 200 + Math.random() * 800,        // 200 to 1000 lux
         moisture: 20 + Math.random() * 80,       // 20 to 100%
-        time: new Date().toLocaleTimeString(),
+        time: getFormattedDateTime(),
+
       };
     }
+function getFormattedDateTime() {
+  const now = new Date();
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  };
+  return now.toLocaleString("en-US", options).replace("at", " - ");
+}
 
     function calculateForecast(data) {
       const stress = [];
@@ -388,23 +464,121 @@
       }
     }
 
-    const ctx = document.getElementById("sensorChart").getContext("2d");
-    const chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: [],
-        datasets: [
-          { label: "Temp (°C)", data: [], borderColor: "#ff6384", fill: false },
-          { label: "Humidity (%)", data: [], borderColor: "#36a2eb", fill: false },
-          { label: "Light (lux)", data: [], borderColor: "#fbc02d", fill: false },
-          { label: "Moisture (%)", data: [], borderColor: "#4caf50", fill: false },
-        ],
+const sensorData = {
+  labels: [], // Fill dynamically with timestamps
+  datasets: [
+    {
+      label: "Temp (°C)",
+      data: [],
+      borderColor: "#ff8a80",
+      backgroundColor: "transparent",
+      tension: 0.4,
+      yAxisID: "y1"
+    },
+    {
+      label: "Humidity (%)",
+      data: [],
+      borderColor: "#82b1ff",
+      backgroundColor: "transparent",
+      tension: 0.4,
+      yAxisID: "y1"
+    },
+    {
+      label: "Moisture (%)",
+      data: [],
+      borderColor: "#BED754",
+      backgroundColor: "transparent",
+      tension: 0.4,
+      yAxisID: "y1"
+    },
+    {
+      label: "Light (lux)",
+      data: [],
+      borderColor: "#FDFFAE",
+      backgroundColor: "transparent",
+      tension: 0.4,
+      yAxisID: "y"
+    },
+  ]
+};
+
+const ctx = document.getElementById("sensorChart").getContext("2d");
+const sensorChart = new Chart(ctx, {
+  type: "line",
+  data: sensorData,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+  legend: { display: false },
+  title: {
+    display: true,
+    text: "Plant Sensor Trends",
+    color: "#e0f2e0",
+    font: { size: 18, weight: 'bold' },
+    padding: { top: 10, bottom: 20 }
+  },
+  tooltip: {
+    backgroundColor: 'rgba(162, 123, 92, 0.90)', // frosted glass look
+    titleColor: '#ffffff',
+    bodyColor: '#e0f2e0',
+    // borderColor: 'rgba(255, 255, 255, 0.3)',
+    // borderWidth: 1,
+    cornerRadius: 10,
+    padding: 12,
+    displayColors: false,
+    titleFont: { size: 14, weight: 'bold' },
+    bodyFont: { size: 13 },
+    callbacks: {
+      label: function (context) {
+        return `${context.dataset.label}: ${context.formattedValue}`;
+      }
+    }
+  }
+},
+
+    scales: {
+      x: {
+        ticks: { color: "#d3f8d3" },
+        grid: { color: "rgba(255, 255, 255, 0.05)" }
       },
-      options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } },
+      y: {
+        beginAtZero: true,
+        position: "left",
+        ticks: { color: "#FDFFAE" },
+        grid: { drawOnChartArea: false },
+        title: {
+          display: true,
+          text: "°C / % (Temp, Humidity, Moisture)",
+          color: "#FDFFAE"
+        }
       },
-    });
+      y1: {
+        beginAtZero: true,
+        position: "right",
+        ticks: { color: "#BED754" },
+        grid: { color: "rgba(255, 255, 255, 0.05)" },
+        title: {
+          display: true,
+          text: "Light (lux)",
+          color: "#BED754"
+        }
+      }
+    }
+  }
+});
+
+// Legend toggle logic
+document.querySelectorAll(".legend-item").forEach(item => {
+  item.addEventListener("click", function () {
+    const index = +this.dataset.index;
+    const meta = sensorChart.getDatasetMeta(index);
+    meta.hidden = meta.hidden === null ? true : !meta.hidden;
+    this.classList.toggle("inactive");
+    sensorChart.update();
+  });
+});
+
 
     function updateTablePage() {
       const totalPages = Math.ceil(allData.length / pageSize) || 1;
@@ -470,15 +644,16 @@
         iconUrl = '';
       }
 
-      healthIndexEl.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center">
-          <span>${score} / 100</span>
-          ${iconUrl
-            ? `<img src="${iconUrl}" alt="score icon" class="plant-icon" style="height:3em; width:2.7em; margin-left:2.8em; margin-top:-0.2em;" />`
-            : ''
-          }
-        </div>
-      `;
+healthIndexEl.innerHTML = `
+  <div class="d-flex align-items-center justify-content-start gap-5">
+    <span>${score} / 100</span>
+    ${iconUrl
+      ? `<img src="${iconUrl}" alt="score icon" class="plant-icon" style="height:3em; width:2.7em; margin-top:-0.2em;" />`
+      : ''
+    }
+  </div>
+`;
+
 
       setStatus("status-moisture", data.moisture, { min: 50, max: 75 });
       setStatus("status-light", data.light, { min: 600, max: 900 });
@@ -492,22 +667,20 @@
         ...calculated,
       });
 
-      chart.data.labels.push(data.time);
-      chart.data.datasets[0].data.push(data.temp);
-      chart.data.datasets[1].data.push(data.humidity);
-      chart.data.datasets[2].data.push(data.light);
-      chart.data.datasets[3].data.push(data.moisture);
+sensorChart.data.labels.push(data.time);
+sensorChart.data.datasets[0].data.push(data.temp);
+sensorChart.data.datasets[1].data.push(data.humidity);
+sensorChart.data.datasets[2].data.push(data.moisture);
+sensorChart.data.datasets[3].data.push(data.light);
 
-      if (chart.data.labels.length > 10) {
-        chart.data.labels.shift();
-        chart.data.datasets.forEach((ds) => ds.data.shift());
-      }
+if (sensorChart.data.labels.length > 10) {
+  sensorChart.data.labels.shift();
+  sensorChart.data.datasets.forEach((ds) => ds.data.shift());
+}
 
-      chart.update();
+sensorChart.update();
+updateTablePage();
 
-      // Update table
-      currentPage = Math.ceil(allData.length / pageSize);
-      updateTablePage();
     }
 
     // Initial setup
