@@ -277,7 +277,7 @@
               <span>Light Level
                  <span id="status-light" class="badge ms-2 bg-secondary">--</span>
               </span>
-              <span tabindex="0" data-bs-toggle="tooltip" title="Light intensity in lux (ideal: 600–900)" style="cursor: pointer; ">
+              <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="Light intensity in lux<br>(🌞Daytime Ideal: 600–900)" style="cursor: pointer; ">
                 <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
               </span>
             </h5>
@@ -292,7 +292,7 @@
               <span>Temperature
                  <span id="status-temp" class="badge ms-2 bg-secondary">--</span>
               </span>
-              <span tabindex="0" data-bs-toggle="tooltip" title="Ideal temp: 22–30°C" style="cursor: pointer; ">
+              <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C" style="cursor: pointer; ">
                 <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
               </span>
             </h5>
@@ -426,25 +426,27 @@ function getFormattedDateTime() {
 
     function calculateForecast(data) {
       const stress = [];
-      if (data.temp > 32)
+      const ranges = getDynamicRanges();
+      if (data.temp > ranges.temp.max)
         stress.push(`<img src="https://img.icons8.com/glassmorphism/48/hot.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=High Temp"/> High Temp`);
-      if (data.temp < 20)
+      if (data.temp < ranges.temp.min)
         stress.push(`<img src="https://img.icons8.com/glassmorphism/48/cold.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Temp"/> Low Temp`);
       if (data.moisture < 40)
         stress.push(`<img src="https://img.icons8.com/glassmorphism/48/ground.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Dry Soil"/> Dry Soil`);
       if (data.moisture > 80)
         stress.push(`<img src="https://img.icons8.com/glassmorphism/48/soil.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Overwatering"/> Overwatering`);
-      if (data.light < 500)
+       if (data.light < ranges.light.min)
         stress.push(`<img src="https://img.icons8.com/glassmorphism/48/clouds.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Light"/> Low Light`);
 
       const stressText = stress.length
         ? stress.join("<br>")
         : `<em>No visible stress</em>`;
 
-      const tempScore = data.temp >= 22 && data.temp <= 30 ? 1 : 0;
+      const tempScore = data.temp >= ranges.temp.min && data.temp <= ranges.temp.max ? 1 : 0;
       const humidityScore = data.humidity >= 60 && data.humidity <= 80 ? 1 : 0;
       const moistureScore = data.moisture >= 50 && data.moisture <= 75 ? 1 : 0;
-      const lightScore = data.light >= 600 && data.light <= 900 ? 1 : 0;
+      const lightScore = data.light >= ranges.light.min && data.light <= ranges.light.max ? 1 : 0;
+
       const healthIndex = ((tempScore + humidityScore + moistureScore + lightScore) / 4) * 100;
 
       return {
@@ -587,6 +589,15 @@ document.querySelectorAll(".legend-item").forEach(item => {
   });
 });
 
+    function getDynamicRanges() {
+      const hour = new Date().getHours();
+      const isDaytime = hour >= 6 && hour < 18; // Example: 6 AM to 6 PM
+
+      return {
+        light: isDaytime ? { min: 600, max: 900 } : { min: 0, max: 10 }, // Light should be near 0 at night
+        temp: isDaytime ? { min: 22, max: 30 } : { min: 15, max: 25 },   // Allow cooler temps at night
+      };
+    }
 
     function getStatus(value, range) {
       if (value >= range.min && value <= range.max) {
@@ -601,30 +612,34 @@ document.querySelectorAll(".legend-item").forEach(item => {
     function updateTablePage() {
       const totalPages = Math.ceil(allData.length / pageSize) || 1;
       currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+      // Reverse the data first
+      const reversedData = [...allData].reverse();
+
       const startIdx = (currentPage - 1) * pageSize;
       const endIdx = startIdx + pageSize;
-      const pageData = allData.slice(startIdx, endIdx);
+      const pageData = reversedData.slice(startIdx, endIdx);
+      const ranges = getDynamicRanges();
 
       dataTableBody.innerHTML = "";
-      pageData.forEach((entry) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${entry.time}</td>
-          <td>${entry.temp.toFixed(1)} - ${getStatus(entry.temp, { min: 22, max: 30 })}</td>
-          <td>${entry.humidity.toFixed(1)} - ${getStatus(entry.humidity, { min: 60, max: 80 })}</td>
-          <td>${entry.light.toFixed(0)} - ${getStatus(entry.light, { min: 600, max: 900 })}</td>
-          <td>${entry.moisture.toFixed(0)} - ${getStatus(entry.moisture, { min: 50, max: 75 })}</td>
-          <td>${entry.stressText}</td>
-          <td>${entry.healthIndex}</td>
-        `;
-        dataTableBody.appendChild(row);
-      });
+    pageData.forEach((entry) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${entry.time}</td>
+        <td>${entry.temp.toFixed(1)} - ${getStatus(entry.temp, ranges.temp)}</td>
+        <td>${entry.humidity.toFixed(1)} - ${getStatus(entry.humidity, { min: 60, max: 80 })}</td>
+        <td>${entry.light.toFixed(0)} - ${getStatus(entry.light, ranges.light)}</td>
+        <td>${entry.moisture.toFixed(0)} - ${getStatus(entry.moisture, { min: 50, max: 75 })}</td>
+        <td>${entry.stressText}</td>
+        <td>${entry.healthIndex}</td>
+      `;
+      dataTableBody.appendChild(row);
+    });
 
-      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-      prevPageBtn.disabled = currentPage === 1;
-      nextPageBtn.disabled = currentPage === totalPages;
-    }
-
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+}
     prevPageBtn.addEventListener("click", () => {
       if (currentPage > 1) {
         currentPage--;
@@ -643,6 +658,7 @@ document.querySelectorAll(".legend-item").forEach(item => {
     function updateDashboard() {
       const data = getSensorData();
       const calculated = calculateForecast(data);
+      const ranges = getDynamicRanges();
 
       // Update UI
       tempEl.textContent = `${data.temp.toFixed(1)}°C`;
@@ -674,8 +690,8 @@ healthIndexEl.innerHTML = `
 
 
       setStatus("status-moisture", data.moisture, { min: 50, max: 75 });
-      setStatus("status-light", data.light, { min: 600, max: 900 });
-      setStatus("status-temp", data.temp, { min: 22, max: 30 });
+      setStatus("status-light", data.light, ranges.light);
+      setStatus("status-temp", data.temp, ranges.temp);
       setStatus("status-humidity", data.humidity, { min: 60, max: 80 });
 
       // Store & chart
