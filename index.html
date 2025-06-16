@@ -9,6 +9,8 @@
 			rel="stylesheet"
 		/>
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
 		<style>
 			* {
 				box-sizing: border-box;
@@ -485,7 +487,7 @@
 				<div id="custom-legend" class="legend-boxes">
 					<span class="legend-item" data-index="0">
 						<span class="color-bar" style="background-color: #ff8a80"></span>
-						Temp (°C)
+						Temperature (°C)
 					</span>
 					<span class="legend-item" data-index="1">
 						<span class="color-bar" style="background-color: #82b1ff"></span>
@@ -493,7 +495,7 @@
 					</span>
 					<span class="legend-item" data-index="2">
 						<span class="color-bar" style="background-color: #bed754"></span>
-						Moisture (%)
+						Soil Moisture (%)
 					</span>
 					<span class="legend-item" data-index="3">
 						<span class="color-bar" style="background-color: #fdffae"></span>
@@ -503,8 +505,12 @@
 			</div>
 
 			<!-- Historical Data Glass Card -->
+
 			<div class="glass-table mt-5">
-				<h4 class="mb-3">Plant Data Records</h4>
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h4 class="mb-0">Plant Data Records</h4>
+					<button id="exportExcel" class="glass-button">Export to Excel</button>
+				</div>
 				<div class="table-responsive">
 					<table class="table table-striped table-bordered" id="dataTable">
 						<thead>
@@ -911,6 +917,16 @@
 			document
 				.querySelectorAll('[data-bs-toggle="tooltip"]')
 				.forEach((el) => new bootstrap.Tooltip(el));
+
+			document
+				.getElementById("exportExcel")
+				.addEventListener("click", function () {
+					const table = document.getElementById("dataTable");
+					const wb = XLSX.utils.book_new();
+					const ws = XLSX.utils.table_to_sheet(table);
+					XLSX.utils.book_append_sheet(wb, ws, "PlantData");
+					XLSX.writeFile(wb, "Plant_Data_Records.xlsx");
+				});
 		</script>
 	</body>
 </html>
