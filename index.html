@@ -316,7 +316,7 @@
           />
         </span>
       </h5>
-      <p id="stress">Analyzing...</p>
+      <p id="stress" style="text-align: left;">Analyzing...</p>
     </div>
   </div>
 </div>
@@ -902,17 +902,17 @@
 					const wb = XLSX.utils.book_new();
 					const ws = XLSX.utils.table_to_sheet(table);
 					XLSX.utils.book_append_sheet(wb, ws, "PlantData");
-					XLSX.writeFile(wb, "Plant_Data_Records.xlsx");
+					XLSX.writeFile(wb, "Plant Data Records.xlsx");
 				});
 
-document.getElementById('exportPDF').addEventListener('click', () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+      document.getElementById('exportPDF').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-  doc.autoTable({ html: '#dataTable' });
+        doc.autoTable({ html: '#dataTable' });
 
-  doc.save('table.pdf');
-});
+        doc.save('Plant Data Records.pdf');
+      });
 		</script>
 	</body>
 </html>
