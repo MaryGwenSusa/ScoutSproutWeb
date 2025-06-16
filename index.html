@@ -10,10 +10,11 @@
 		/>
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 		<style>
 			* {
@@ -64,14 +65,17 @@
 				text-decoration: underline;
 				transition: color 0.3s ease;
 			}
+			.toast-container {
+				display: block;
+			}
 			footer {
 				background-color: #00ff8044;
 				margin-top: 4rem;
 				color: white;
 			}
-      .pdf-margin{
-        margin-left: 6px !important; 
-      }
+			.pdf-margin {
+				margin-left: 6px !important;
+			}
 
 			.glass-card {
 				background: rgba(255, 255, 255, 0.07); /* semi-transparent white */
@@ -196,13 +200,13 @@
 
 			.glass-table {
 				background: rgba(42, 30, 30, 0.1);
+				width: 100%;
 				border-radius: 1.5rem;
 				padding: 2rem;
 				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 				backdrop-filter: blur(14px);
 				-webkit-backdrop-filter: blur(10px);
-				margin-left: 7em;
-				margin-right: 7em;
+
 				color: white;
 			}
 			.glass-table table {
@@ -270,14 +274,10 @@
 				>
 					<ul class="navbar-nav">
 						<li class="nav-item">
-							<a class="nav nav-link text-white" href="#metrics">
-								Plant Status
-							</a>
+							<a class="nav nav-link text-white" href="#metrics">Dashboard</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav nav-link text-white" href="#readings">
-								Live Sensor Readings
-							</a>
+							<a class="nav nav-link text-white" href="#readings">Readings</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#trends">
@@ -286,7 +286,7 @@
 						</li>
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#records">
-								Sensor Records
+								Data Records
 							</a>
 						</li>
 					</ul>
@@ -295,15 +295,18 @@
 		</header>
 
 		<div class="container py-4">
-			<h2 class="text-center mb-3 mt-5 display-5 matte-text">
+			<h2 class="text-center mb-3 mt-5 display-5 matte-text" id="metrics">
 				Plant Monitoring Dashboard
 			</h2>
 
 			<!-- Calculated Values FIRST -->
-			<h4 class="mt-1 mb-3 matte-sub-head" id="metrics">Plant Status</h4>
+			<h4 class="mt-1 mb-3 matte-sub-head">Plant Status</h4>
 			<div class="row mt-3">
 				<div class="col-md-4">
-					<div class="card shadow glass-card">
+					<div
+						class="card shadow text-center glass-card"
+						style="border-left: 4px solid #dcdcdc"
+					>
 						<div class="card-body">
 							<h5 class="d-flex justify-content-between align-items-center">
 								<span>Plant Stress</span>
@@ -316,20 +319,20 @@
 									<img
 										src="https://img.icons8.com/glassmorphism/48/open-book.png"
 										alt="Info"
-										style="
-											width: 1.7em;
-											height: 1.7em;
-											vertical-align: text-bottom;
-										"
+										style="width: 1.7em; height: 1.7em; vertical-align: middle"
 									/>
 								</span>
 							</h5>
-							<p id="stress">Analyzing...</p>
+							<p id="stress" style="text-align: left">Analyzing...</p>
 						</div>
 					</div>
 				</div>
+
 				<div class="col-md-4">
-					<div class="card shadow glass-card">
+					<div
+						class="card shadow text-center glass-card"
+						style="border-left: 4px solid #dcdcdc"
+					>
 						<div class="card-body">
 							<h5 class="d-flex justify-content-between align-items-center">
 								<span>Health Index Score</span>
@@ -365,7 +368,7 @@
 				<div class="col-md-3">
 					<div
 						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #bed754"
+						style="border-left: 4px solid #bed754"
 					>
 						<div class="card-body">
 							<div
@@ -377,7 +380,6 @@
 										Poor
 									</span>
 								</div>
-
 								<span
 									tabindex="0"
 									data-bs-toggle="tooltip"
@@ -400,25 +402,23 @@
 				<div class="col-md-3">
 					<div
 						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #fdffae"
+						style="border-left: 4px solid #fdffae"
 					>
 						<div class="card-body">
 							<div
-								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
+								class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5"
 							>
-                <div>
-								  <span class="fw-bold">Light Level</span>
-                
-								  <span id="status-light" class="badge bg-secondary">--</span>
-								  <span
+								<div>
+									<span class="fw-bold">Light Level</span>
+									<span id="status-light" class="badge bg-secondary">--</span>
+								</div>
+								<span
 									tabindex="0"
 									data-bs-toggle="tooltip"
 									data-bs-html="true"
 									title="Light intensity in lux<br>(🌞Daytime Ideal: 600–900)"
 									style="cursor: pointer"
-								  >
-                </div>
-
+								>
 									<img
 										src="https://img.icons8.com/glassmorphism/48/open-book.png"
 										alt="Info"
@@ -431,28 +431,26 @@
 					</div>
 				</div>
 
-				<!-- Temperature Card -->
 				<div class="col-md-3">
 					<div
 						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #ff8a80"
+						style="border-left: 4px solid #ff8a80"
 					>
 						<div class="card-body">
 							<div
-								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
+								class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5"
 							>
-                <div>
-                  <span class="fw-bold">Temperature</span>
-                  <span id="status-temp" class="badge bg-secondary">--</span>
-                  <span
-                    tabindex="0"
-                    data-bs-toggle="tooltip"
-                    data-bs-html="true"
-                    title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C"
-                    style="cursor: pointer"
-                  >
-                </div>
-
+								<div>
+									<span class="fw-bold">Temperature</span>
+									<span id="status-temp" class="badge bg-secondary">--</span>
+								</div>
+								<span
+									tabindex="0"
+									data-bs-toggle="tooltip"
+									data-bs-html="true"
+									title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C"
+									style="cursor: pointer"
+								>
 									<img
 										src="https://img.icons8.com/glassmorphism/48/open-book.png"
 										alt="Info"
@@ -469,21 +467,24 @@
 				<div class="col-md-3">
 					<div
 						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #82b1ff"
+						style="border-left: 4px solid #82b1ff"
 					>
 						<div class="card-body">
 							<div
-								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
+								class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5"
 							>
-                <div>
-                  <span class="fw-bold">Humidity</span>
-                  <span id="status-humidity" class="badge bg-secondary">--</span>
-                  <span
-                    tabindex="0"
-                    data-bs-toggle="tooltip"
-                    title="Ideal: 60–80%"
-                    style="cursor: pointer">
-                </div>
+								<div>
+									<span class="fw-bold">Humidity</span>
+									<span id="status-humidity" class="badge bg-secondary">
+										--
+									</span>
+								</div>
+								<span
+									tabindex="0"
+									data-bs-toggle="tooltip"
+									title="Ideal: 60–80%"
+									style="cursor: pointer"
+								>
 									<img
 										src="https://img.icons8.com/glassmorphism/48/open-book.png"
 										alt="Info"
@@ -497,11 +498,115 @@
 				</div>
 			</div>
 
+			<!-- Toast container for ALL toasts -->
+			<div
+				class="toast-container position-fixed top-0 end-0 p-3"
+				style="display: flex; flex-direction: column; gap: 0.5rem"
+			>
+				>
+				<div
+					id="tempLowToast"
+					class="toast align-items-center text-bg-primary"
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+					style="margin-top: 2rem"
+				>
+					<div class="d-flex">
+						<div class="toast-body">
+							❄️ Temperature is
+							<span id="tempLowValue">--</span>
+							°C. Stay away from sunlight.
+						</div>
+						<button
+							type="button"
+							class="btn-close btn-close-white me-2 m-auto"
+							data-bs-dismiss="toast"
+							aria-label="Close"
+						></button>
+					</div>
+				</div>
+
+				<!-- Temperature High Toast -->
+				<div
+					id="tempHighToast"
+					class="toast align-items-center text-bg-success"
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+					style="margin-top: 2rem"
+				>
+					<div class="d-flex">
+						<div class="toast-body">
+							☀️ Plant got enough sunlight. Temperature is
+							<span id="tempHighValue">--</span>
+							°C.
+						</div>
+						<button
+							type="button"
+							class="btn-close btn-close-white me-2 m-auto"
+							data-bs-dismiss="toast"
+							aria-label="Close"
+						></button>
+					</div>
+				</div>
+				<!-- Soil Moisture Toast Container -->
+				<div
+					class="toast-container position-fixed top-0 end-0 p-3 d-flex flex-column gap-2"
+				>
+					<!-- LOW Moisture Toast -->
+					<div
+						id="moistureToast"
+						class="toast align-items-center text-bg-warning"
+						role="alert"
+						aria-live="assertive"
+						aria-atomic="true"
+						style="margin-top: 2rem"
+					>
+						<div class="d-flex">
+							<div class="toast-body">
+								⚠️ Water the plant. Soil moisture is
+								<span id="moistureValueLow">--</span>
+								%.
+							</div>
+							<button
+								type="button"
+								class="btn-close btn-close-white me-2 m-auto"
+								data-bs-dismiss="toast"
+							></button>
+						</div>
+					</div>
+
+					<!-- HIGH Moisture Toast -->
+					<div
+						id="moistureToastHigh"
+						class="toast align-items-center text-bg-info"
+						role="alert"
+						aria-live="assertive"
+						aria-atomic="true"
+						style="margin-top: 2rem"
+					>
+						<div class="d-flex">
+							<div class="toast-body">
+								💧 Soil moisture is
+								<span id="moistureValueHigh">--</span>
+								%. Reduce watering.
+							</div>
+							<button
+								type="button"
+								class="btn-close btn-close-white me-2 m-auto"
+								data-bs-dismiss="toast"
+							></button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- Sensor Trend Chart (Glass Styled) -->
 			<div
 				class="chart-card"
 				style="
-					width: 85%;
+					width: 100%;
 					margin: 0 auto;
 					margin-top: 8em;
 					margin-bottom: 8em;
@@ -544,20 +649,38 @@
 				<div class="d-flex justify-content-between align-items-center mb-3">
 					<h4 class="mb-0" id="records">Plant Data Records</h4>
 
-          <section class="d-flex">
-              <div>
-                <button id="exportExcel" class="glass-button">
-                  <img style="height: 1.2em; width: 1.2em; vertical-align: text-bottom; display: inline;" src="https://img.icons8.com/?size=100&id=x1VwrcUzXIPb&format=png&color=ffffff" alt="ms-excel" />
-                  Export to Excel
-                </button>
-              </div>
-              <div class="pdf-margin">
-                <button id="exportPDF" class="glass-button">
-                  <img style="height: 1.2em; width: 1.2em; vertical-align: text-bottom; display: inline;" src="https://img.icons8.com/?size=100&id=x1VwrcUzXIPb&format=png&color=ffffff" alt="pdf" />
-                  Export to PDF
-                </button>
-              </div>
-            </section>
+					<section class="d-flex">
+						<div>
+							<button id="exportExcel" class="glass-button">
+								<img
+									style="
+										height: 1.2em;
+										width: 1.2em;
+										vertical-align: text-bottom;
+										display: inline;
+									"
+									src="https://img.icons8.com/?size=100&id=x1VwrcUzXIPb&format=png&color=ffffff"
+									alt="ms-excel"
+								/>
+								Export to Excel
+							</button>
+						</div>
+						<div class="pdf-margin">
+							<button id="exportPDF" class="glass-button">
+								<img
+									style="
+										height: 1.2em;
+										width: 1.2em;
+										vertical-align: text-bottom;
+										display: inline;
+									"
+									src="https://img.icons8.com/?size=100&id=x1VwrcUzXIPb&format=png&color=ffffff"
+									alt="pdf"
+								/>
+								Export to PDF
+							</button>
+						</div>
+					</section>
 				</div>
 				<div class="table-responsive">
 					<table class="table table-striped table-bordered" id="dataTable">
@@ -619,13 +742,49 @@
 			let allData = [];
 
 			function getSensorData() {
-				return {
-					temp: 15 + Math.random() * 25, // 15 to 40 °C
-					humidity: 30 + Math.random() * 60, // 30 to 90%
-					light: 200 + Math.random() * 800, // 200 to 1000 lux
-					moisture: 20 + Math.random() * 80, // 20 to 100%
-					time: getFormattedDateTime(),
-				};
+				const temp = 15 + Math.random() * 25;
+				const humidity = 30 + Math.random() * 60;
+				const light = 200 + Math.random() * 800;
+				const moisture = 20 + Math.random() * 80;
+				const time = getFormattedDateTime();
+
+				// Moisture Toast
+				if (moisture < 50) {
+					document.getElementById("moistureValueLow").textContent =
+						moisture.toFixed(1);
+					const toast = new bootstrap.Toast(
+						document.getElementById("moistureToast"),
+						{ delay: 3000 }
+					);
+					toast.show();
+				} else if (moisture > 80) {
+					document.getElementById("moistureValueHigh").textContent =
+						moisture.toFixed(1);
+					const toast = new bootstrap.Toast(
+						document.getElementById("moistureToastHigh"),
+						{ delay: 3000 }
+					);
+					toast.show();
+				}
+				// Temperature toasts
+				if (temp < 22) {
+					document.getElementById("tempLowValue").textContent = temp.toFixed(1);
+					const toast = new bootstrap.Toast(
+						document.getElementById("tempLowToast"),
+						{ delay: 3000 }
+					);
+					toast.show();
+				} else if (temp > 30) {
+					document.getElementById("tempHighValue").textContent =
+						temp.toFixed(1);
+					const toast = new bootstrap.Toast(
+						document.getElementById("tempHighToast"),
+						{ delay: 3000 }
+					);
+					toast.show();
+				}
+
+				return { temp, humidity, light, moisture, time };
 			}
 			function getFormattedDateTime() {
 				const now = new Date();
@@ -762,8 +921,6 @@
 							backgroundColor: "rgba(162, 123, 92, 0.90)", // frosted glass look
 							titleColor: "#ffffff",
 							bodyColor: "#e0f2e0",
-							// borderColor: 'rgba(255, 255, 255, 0.3)',
-							// borderWidth: 1,
 							cornerRadius: 10,
 							padding: 12,
 							displayColors: false,
@@ -785,23 +942,23 @@
 						y: {
 							beginAtZero: true,
 							position: "left",
-							ticks: { color: "#FDFFAE" },
+							ticks: { color: "#BED754" },
 							grid: { drawOnChartArea: false },
 							title: {
 								display: true,
 								text: "°C / % (Temp, Humidity, Moisture)",
-								color: "#FDFFAE",
+								color: "#BED754",
 							},
 						},
 						y1: {
 							beginAtZero: true,
 							position: "right",
-							ticks: { color: "#BED754" },
+							ticks: { color: "#FDFFAE" },
 							grid: { color: "rgba(255, 255, 255, 0.05)" },
 							title: {
 								display: true,
 								text: "Light (lux)",
-								color: "#BED754",
+								color: "#FDFFAE",
 							},
 						},
 					},
@@ -855,26 +1012,23 @@
 				pageData.forEach((entry) => {
 					const row = document.createElement("tr");
 					row.innerHTML = `
-          <td>${entry.time}</td>
-          <td>${entry.temp.toFixed(1)} - ${getStatus(
-						entry.temp,
-						ranges.temp
-					)}</td>
-          <td>${entry.humidity.toFixed(1)} - ${getStatus(entry.humidity, {
+			       <td>${entry.time}</td>
+			       <td>${entry.temp.toFixed(1)} - ${getStatus(entry.temp, ranges.temp)}</td>
+			       <td>${entry.humidity.toFixed(1)} - ${getStatus(entry.humidity, {
 						min: 60,
 						max: 80,
 					})}</td>
-          <td>${entry.light.toFixed(0)} - ${getStatus(
+			       <td>${entry.light.toFixed(0)} - ${getStatus(
 						entry.light,
 						ranges.light
 					)}</td>
-          <td>${entry.moisture.toFixed(0)} - ${getStatus(entry.moisture, {
+			       <td>${entry.moisture.toFixed(0)} - ${getStatus(entry.moisture, {
 						min: 50,
 						max: 75,
 					})}</td>
-          <td>${entry.stressText}</td>
-          <td>${entry.healthIndex}</td>
-        `;
+			       <td>${entry.stressText}</td>
+			       <td>${entry.healthIndex}</td>
+			     `;
 					dataTableBody.appendChild(row);
 				});
 
@@ -921,15 +1075,15 @@
 				}
 
 				healthIndexEl.innerHTML = `
-        <div class="d-flex align-items-center justify-content-start gap-5">
-          <span>${score} / 100</span>
-          ${
-						iconUrl
-							? `<img src="${iconUrl}" alt="score icon" class="plant-icon" style="height:3em; width:2.7em; margin-top:-0.2em;" />`
-							: ""
-					}
-        </div>
-      `;
+			     <div class="d-flex align-items-center justify-content-start gap-5">
+			       <span>${score} / 100</span>
+			       ${
+								iconUrl
+									? `<img src="${iconUrl}" alt="score icon" class="plant-icon" style="height:3em; width:2.7em; margin-top:-0.2em;" />`
+									: ""
+							}
+			     </div>
+			   `;
 
 				setStatus("status-moisture", data.moisture, { min: 50, max: 75 });
 				setStatus("status-light", data.light, ranges.light);
@@ -973,17 +1127,17 @@
 					const wb = XLSX.utils.book_new();
 					const ws = XLSX.utils.table_to_sheet(table);
 					XLSX.utils.book_append_sheet(wb, ws, "PlantData");
-					XLSX.writeFile(wb, "Plant_Data_Records.xlsx");
+					XLSX.writeFile(wb, "Plant Data Records.xlsx");
 				});
 
-document.getElementById('exportPDF').addEventListener('click', () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+			document.getElementById("exportPDF").addEventListener("click", () => {
+				const { jsPDF } = window.jspdf;
+				const doc = new jsPDF();
 
-  doc.autoTable({ html: '#dataTable' });
+				doc.autoTable({ html: "#dataTable" });
 
-  doc.save('table.pdf');
-});
+				doc.save("Plant Data Records.pdf");
+			});
 		</script>
 	</body>
 </html>
