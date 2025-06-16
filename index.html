@@ -1,749 +1,989 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Spider Plant Monitoring Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-    }
-    html, body {
-      height: auto;
-      min-height: 100%;
-    }
-    html {
-      scroll-padding-top: 80px; 
-      scroll-behavior: smooth;
-    }
-    img {
-      width: 100%;
-    }
-    body {
-      background: url('images/web_bg.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #e6f4e6; /* light desaturated green-white */
-      font-family: 'Segoe UI', sans-serif;
-      position: relative;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(1, 26, 1, 0.568); /* dark green matte overlay */
-      z-index: -1;
-    }
-    header {
-      background: transparent;
-      position: fixed;
-      width: 100%;
-      z-index: 10;
-    }
-    .no-hover:hover{
-      text-decoration: none;
-    }
-    footer {
-      background-color: #198754;
-      margin-top: 4rem;
-      color: white;
-    }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.07); /* semi-transparent white */
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(10px);
-      border: none;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      color: #e0f2e0;
-      height: 160px; /* Set your desired fixed height */
-    }
-    .glass-card h2 {
-      font-size: 2.5rem; /* Make sensor readings bigger */
-      margin-bottom: 3rem; /* Add space below reading */
-      color: #D8E9A8;
-    }
-    .score-box {
-      margin-top: -0.3em;
-      font-size: 2.2rem;
-      font-weight: bold;
-      color: #BEF992;
-      width: 10em;
-    }
-    .matte-text {
-      color: rgba(255, 255, 255, 0.85); /* soft white */
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* slight shadow for contrast */
-      font-weight: 600;
-      filter: brightness(1); /* slightly dims for a matte feel */
-    }
-    .matte-sub-head{
-        color: rgba(255, 255, 255, 0.85); /* soft white */
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* slight shadow for contrast */
-        filter: brightness(1); /* slightly dims for a matte feel */
-    }
-    .glass-badge {
-      font-size: 0.75rem;
-      padding: 0.3em 0.75em;
-      border-radius: 12px;
-      backdrop-filter: blur(4px);
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-    }
-    .status-ideal {
-      background: rgba(0, 200, 83, 0.25); /* soft green */
-    }
-    .status-fair {
-      background: rgba(255, 193, 7, 0.25); /* soft yellow */
-    }
-    .status-poor {
-      background: rgba(244, 67, 54, 0.25); /* soft red */
-    }
-    .tooltip-inner {
-      background: #a27b5ca0;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      font-size: 0.9rem;
-      padding: 8px 12px;
-    }
-    .tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before,
-    .tooltip.bs-tooltip-top .arrow::before {
-      border-top-color: rgba(255, 255, 255, 0.15);
-    }
-    @keyframes wiggle {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(3deg); }
-      50% { transform: rotate(-3deg); }
-      75% { transform: rotate(3deg); }
-      100% { transform: rotate(0deg); }
-    }
-    .plant-icon:hover {
-      animation: wiggle 0.4s ease-in-out;
-    }
-    .legend-boxes {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 1em;
-      flex-wrap: wrap;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      background-color:  rgba(255, 255, 255, 0.08);
-      transition: opacity 0.3s ease, transform 0.2s ease;
-    }
-
-    .legend-item:hover {
-      transform: scale(1.05);
-    }
-
-    .legend-item.inactive {
-      opacity: 0.4;
-    }
-
-    .legend-item .color-bar {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
-      display: inline-block;
-    }
-
-    .glass-table {
-      background: rgba(42, 30, 30, 0.1);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(10px);
-      margin-left: 7em;
-      margin-right: 7em;
-      color: white;
-    }
-    .glass-table table {
-      border-color: rgba(255, 255, 255, 0.159);
-      
-    }
-    .glass-table thead th {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-    .glass-table tbody td {
-      background-color: transparent;
-      border-color: rgba(255, 255, 255, 0.2);
-      color: rgb(255, 255, 255);
-    }
-    .glass-button {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: transparent;
-  color: #fff;
-  border-radius: 12px;
-  padding: 6px 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: background 0.3s ease, transform 0.2s;
-}
-
-.glass-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  /* transform: scale(1.03); */
-}
-
-.glass-button:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
+	<head>
+		<meta charset="UTF-8" />
+		<title>Plant Monitoring Dashboard</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 
-  </style>
-</head>
-<body>
-<header>
- <nav class="navbar navbar-expand-lg navbar-light px-4 py-2" style="background-color: rgba(61, 100, 77, 0); ;">
-    <a class="navbar-brand fw-bold fs-5 text-white no-hover" href="index.html">🌱 Sprout Scout</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#metrics">Plant Status</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#readings">Live Sensor Readings</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="#trends">Sensor Trends</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-</header>
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+			}
+			html,
+			body {
+				height: auto;
+				min-height: 100%;
+			}
+			html {
+				scroll-padding-top: 80px;
+				scroll-behavior: smooth;
+			}
+			img {
+				width: 100%;
+			}
+			body {
+				background: url("images/web_bg.jpg") no-repeat center center fixed;
+				background-size: cover;
+				color: #e6f4e6; /* light desaturated green-white */
+				font-family: "Segoe UI", sans-serif;
+				position: relative;
+			}
+			body::before {
+				content: "";
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(1, 26, 1, 0.568); /* dark green matte overlay */
+				z-index: -1;
+			}
+			header {
+				background: transparent;
+				position: fixed;
+				width: 100%;
+				z-index: 10;
+			}
+			.no-hover:hover {
+				text-decoration: none;
+			}
 
-  <div class="container py-4">
-    <h2 class="text-center mb-3 mt-5 display-5 matte-text">
-      Spider Plant Monitoring Dashboard
-    </h2>
-
-    <!-- Calculated Values FIRST -->
-    <h4 class="mt-1 mb-3 matte-sub-head" id="metrics">Plant Status</h4>
-    <div class="row mt-3">
-      <div class="col-md-4 ">
-        <div class="card shadow glass-card">
-        <div class="card-body ">
-          <h5 class="d-flex justify-content-between align-items-center">
-            <span>Plant Stress</span>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Shows environmental stress signals" style="cursor: pointer;">
-              <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
-            </span>
-
-          </h5>
-          <p id="stress">Analyzing...</p>
-        </div>
-      </div>
-    </div>
-      <div class="col-md-4">
-          <div class="card shadow glass-card">
-            <div class="card-body">
-              <h5 class="d-flex justify-content-between align-items-center">
-              <span>Health Index Score</span>
-              <span tabindex="0" data-bs-toggle="tooltip" title="Overall condition score (0–100)" style="cursor: pointer; ">
-                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
-              </span>
-              </h5>
-              <div class="score-box" id="healthIndex">--</div>
-            </div>
-          </div>
-      </div>
-    </div>
-
-    <!-- Live Sensor Metrics AFTER -->
-    <h4 class="mt-3 mb-3 matte-sub-head" id="readings">Live Sensor Readings</h4>
-    <div class="row text-center mt-3">
-      <div class="col-md-3">
-        <div class="card shadow glass-card">
-        <div class="card-body ">
-          <h5 class="d-flex justify-content-between align-items-center">
-            <span>Soil Moisture
-              <span id="status-moisture" class="glass-badge status-poor ms-2">Poor</span>
-            </span>
-            <span tabindex="0" data-bs-toggle="tooltip" title="Ideal range: 50–75%" style="cursor: pointer; ">
-              <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
-            </span>
-          </h5>
-        </div>
-        <h2 id="moisture">--%</h2>
-        </div>
-      </div>
-    <div class="col-md-3">
-      <div class="card shadow glass-card">
-          <div class="card-body ">
-            <h5 class="d-flex justify-content-between align-items-center">
-              <span>Light Level
-                 <span id="status-light" class="badge ms-2 bg-secondary">--</span>
-              </span>
-              <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="Light intensity in lux<br>(🌞Daytime Ideal: 600–900)" style="cursor: pointer; ">
-                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
-              </span>
-            </h5>
-          </div>
-        <h2 id="light">-- lux</h2>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow glass-card">
-          <div class="card-body ">
-            <h5 class="d-flex justify-content-between align-items-center">
-              <span>Temperature
-                 <span id="status-temp" class="badge ms-2 bg-secondary">--</span>
-              </span>
-              <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C" style="cursor: pointer; ">
-                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
-              </span>
-            </h5>
-          </div>
-      <h2 id="temp">--°C</h2>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card shadow glass-card">
-          <div class="card-body ">
-            <h5 class="d-flex justify-content-between align-items-center">
-              <span>Humidity
-                 <span id="status-humidity" class="badge ms-2 bg-secondary">--</span>
-              </span>
-              <span tabindex="0" data-bs-toggle="tooltip" title="Humidity comfort zone: 60–80%" style="cursor: pointer; ">
-                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: text-bottom;" />
-              </span>
-            </h5>
-          </div>
-      <h2 id="humidity">--%</h2>
-      </div>
-    </div>
-    </div>
-  </div>
-
-<!-- Sensor Trend Chart (Glass Styled) -->
-<div class="chart-card" style="width: 85%; margin: 0 auto; margin-top: 8em; margin-bottom: 8em; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 1rem; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
-  
-  <!-- Chart Canvas -->
-  <div style="position: relative; height: 450px;">
-    <canvas id="sensorChart"></canvas>
-  </div>
-
-  <!-- Custom Legend -->
-  <div id="custom-legend" class="legend-boxes">
-    <span class="legend-item" data-index="0">
-      <span class="color-bar" style="background-color: #ff8a80;"></span>
-      Temp (°C)
-    </span>
-    <span class="legend-item" data-index="1">
-      <span class="color-bar" style="background-color: #82b1ff;"></span>
-      Humidity (%)
-    </span>
-    <span class="legend-item" data-index="2">
-      <span class="color-bar" style="background-color: #BED754;"></span>
-      Moisture (%)
-    </span>
-    <span class="legend-item" data-index="3">
-      <span class="color-bar" style="background-color: #FDFFAE;"></span>
-      Light (lux)
-    </span>
-  </div>
-</div>
-
-    <!-- Historical Data Glass Card -->
-    <div class="glass-table mt-5">
-      <h4 class="mb-3">Plant Data Records</h4>
-      <div class="table-responsive">
-        <table class="table table-striped table-bordered" id="dataTable">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Temp (°C)</th>
-              <th>Humidity (%)</th>
-              <th>Light (lux)</th>
-              <th>Moisture (%)</th>
-              <th>Plant Stress</th>
-              <th>Health Index</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div id="pagination" class="text-center mt-3">
-  <button id="prevPage" class="glass-button me-2" disabled>Previous</button>
-  <span id="pageInfo" class="mx-2 text-white"></span>
-  <button id="nextPage" class="glass-button ms-2" disabled>Next</button>
-</div>
-
-    </div>
-  </div>
-
-  <footer>
-    <p class="text-center text-white fw-bold mb-0 py-2">&copy; Sprout Scout 2025. All Rights Reserved.</p>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    const tooltipList = tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-    const tempEl = document.getElementById("temp");
-    const humidityEl = document.getElementById("humidity");
-    const lightEl = document.getElementById("light");
-    const moistureEl = document.getElementById("moisture");
-    const stressEl = document.getElementById("stress");
-    const healthIndexEl = document.getElementById("healthIndex");
-    const dataTableBody = document.querySelector("#dataTable tbody");
-    const prevPageBtn = document.getElementById("prevPage");
-    const nextPageBtn = document.getElementById("nextPage");
-    const pageInfo = document.getElementById("pageInfo");
-    const lowScoreIcon = 'images/unhealthy_plant.png';     // e.g. for 0 or 25
-    const highScoreIcon = 'images/healthy_plant.png';  // e.g. for 75 or 100
-
-    let daysSincePlanting = null; // fallback default
-    const pageSize = 10;
-    let currentPage = 1;
-    let allData = [];
-
-    function getSensorData() {
-      return {
-        temp: 15 + Math.random() * 25,           // 15 to 40 °C
-        humidity: 30 + Math.random() * 60,       // 30 to 90%
-        light: 200 + Math.random() * 800,        // 200 to 1000 lux
-        moisture: 20 + Math.random() * 80,       // 20 to 100%
-        time: getFormattedDateTime(),
-
-      };
-    }
-function getFormattedDateTime() {
-  const now = new Date();
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
-  };
-  return now.toLocaleString("en-US", options).replace("at", " - ");
-}
-
-    function calculateForecast(data) {
-      const stress = [];
-      const ranges = getDynamicRanges();
-      if (data.temp > ranges.temp.max)
-        stress.push(`<img src="https://img.icons8.com/glassmorphism/48/hot.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=High Temp"/> High Temp`);
-      if (data.temp < ranges.temp.min)
-        stress.push(`<img src="https://img.icons8.com/glassmorphism/48/cold.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Temp"/> Low Temp`);
-      if (data.moisture < 40)
-        stress.push(`<img src="https://img.icons8.com/glassmorphism/48/ground.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Dry Soil"/> Dry Soil`);
-      if (data.moisture > 80)
-        stress.push(`<img src="https://img.icons8.com/glassmorphism/48/soil.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Overwatering"/> Overwatering`);
-       if (data.light < ranges.light.min)
-        stress.push(`<img src="https://img.icons8.com/glassmorphism/48/clouds.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Light"/> Low Light`);
-
-      const stressText = stress.length
-        ? stress.join("<br>")
-        : `<em>No visible stress</em>`;
-
-      const tempScore = data.temp >= ranges.temp.min && data.temp <= ranges.temp.max ? 1 : 0;
-      const humidityScore = data.humidity >= 60 && data.humidity <= 80 ? 1 : 0;
-      const moistureScore = data.moisture >= 50 && data.moisture <= 75 ? 1 : 0;
-      const lightScore = data.light >= ranges.light.min && data.light <= ranges.light.max ? 1 : 0;
-
-      const healthIndex = ((tempScore + humidityScore + moistureScore + lightScore) / 4) * 100;
-
-      return {
-        stressText,
-        healthIndex: healthIndex.toFixed(0),
-      };
-    }
-
-    function setStatus(el, value, goodRange) {
-      const badge = document.getElementById(el);
-      badge.className = "glass-badge ms-2"; // reset
-
-      if (value >= goodRange.min && value <= goodRange.max) {
-        badge.textContent = "Ideal";
-        badge.classList.add("status-ideal");
-      } else if (
-        value >= goodRange.min - 10 &&
-        value <= goodRange.max + 10
-      ) {
-        badge.textContent = "Fair";
-        badge.classList.add("status-fair");
-      } else {
-        badge.textContent = "Poor";
-        badge.classList.add("status-poor");
+			.navbar-nav .nav-link:hover {
+				color: #ffd700;
+				text-decoration: underline;
+				transition: color 0.3s ease;
+			}
+			footer {
+				background-color: #00ff8044;
+				margin-top: 4rem;
+				color: white;
+			}
+      .pdf-margin{
+        margin-left: 6px !important; 
       }
-    }
 
-const sensorData = {
-  labels: [], // Fill dynamically with timestamps
-  datasets: [
-    {
-      label: "Temp (°C)",
-      data: [],
-      borderColor: "#ff8a80",
-      backgroundColor: "transparent",
-      tension: 0.4,
-      yAxisID: "y1"
-    },
-    {
-      label: "Humidity (%)",
-      data: [],
-      borderColor: "#82b1ff",
-      backgroundColor: "transparent",
-      tension: 0.4,
-      yAxisID: "y1"
-    },
-    {
-      label: "Moisture (%)",
-      data: [],
-      borderColor: "#BED754",
-      backgroundColor: "transparent",
-      tension: 0.4,
-      yAxisID: "y1"
-    },
-    {
-      label: "Light (lux)",
-      data: [],
-      borderColor: "#FDFFAE",
-      backgroundColor: "transparent",
-      tension: 0.4,
-      yAxisID: "y"
-    },
-  ]
-};
+			.glass-card {
+				background: rgba(255, 255, 255, 0.07); /* semi-transparent white */
+				backdrop-filter: blur(8px);
+				-webkit-backdrop-filter: blur(10px);
+				border: none;
+				border-radius: 1rem;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+				color: #e0f2e0;
+				height: 160px; /* Set your desired fixed height */
+			}
+			.glass-card h2 {
+				font-size: 2.5rem; /* Make sensor readings bigger */
+				margin-bottom: 3rem; /* Add space below reading */
+				color: #d8e9a8;
+			}
+			.score-box {
+				margin-top: -0.3em;
+				font-size: 2.2rem;
+				font-weight: bold;
+				color: #bef992;
+				width: 10em;
+			}
+			.matte-text {
+				color: rgba(255, 255, 255, 0.85); /* soft white */
+				text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* slight shadow for contrast */
+				font-weight: 600;
+				filter: brightness(1); /* slightly dims for a matte feel */
+			}
+			.matte-sub-head {
+				color: rgba(255, 255, 255, 0.85); /* soft white */
+				text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* slight shadow for contrast */
+				filter: brightness(1); /* slightly dims for a matte feel */
+			}
+			.glass-badge {
+				font-size: 0.75rem;
+				padding: 0.3em 0.75em;
+				border-radius: 12px;
+				backdrop-filter: blur(4px);
+				background: rgba(255, 255, 255, 0.15);
+				color: white;
+			}
+			.status-ideal {
+				background: rgba(0, 200, 83, 0.25); /* soft green */
+			}
+			.status-fair {
+				background: rgba(255, 193, 7, 0.25); /* soft yellow */
+			}
+			.status-poor {
+				background: rgba(244, 67, 54, 0.25); /* soft red */
+			}
+			.tooltip-inner {
+				background: #a27b5ca0;
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				color: white;
+				border-radius: 12px;
+				box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+				font-size: 0.9rem;
+				padding: 8px 12px;
+			}
+			.tooltip.bs-tooltip-auto[x-placement^="top"] .arrow::before,
+			.tooltip.bs-tooltip-top .arrow::before {
+				border-top-color: rgba(255, 255, 255, 0.15);
+			}
+			@keyframes wiggle {
+				0% {
+					transform: rotate(0deg);
+				}
+				25% {
+					transform: rotate(3deg);
+				}
+				50% {
+					transform: rotate(-3deg);
+				}
+				75% {
+					transform: rotate(3deg);
+				}
+				100% {
+					transform: rotate(0deg);
+				}
+			}
+			.plant-icon:hover {
+				animation: wiggle 0.4s ease-in-out;
+			}
+			.legend-boxes {
+				display: flex;
+				gap: 12px;
+				justify-content: center;
+				margin-top: 1em;
+				flex-wrap: wrap;
+			}
 
-const ctx = document.getElementById("sensorChart").getContext("2d");
-const sensorChart = new Chart(ctx, {
-  type: "line",
-  data: sensorData,
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-  legend: { display: false },
-  title: {
-    display: true,
-    text: "Plant Sensor Trends",
-    color: "#e0f2e0",
-    font: { size: 18, weight: 'bold' },
-    padding: { top: 10, bottom: 20 }
-  },
-  tooltip: {
-    backgroundColor: 'rgba(162, 123, 92, 0.90)', // frosted glass look
-    titleColor: '#ffffff',
-    bodyColor: '#e0f2e0',
-    // borderColor: 'rgba(255, 255, 255, 0.3)',
-    // borderWidth: 1,
-    cornerRadius: 10,
-    padding: 12,
-    displayColors: false,
-    titleFont: { size: 14, weight: 'bold' },
-    bodyFont: { size: 13 },
-    callbacks: {
-      label: function (context) {
-        return `${context.dataset.label}: ${context.formattedValue}`;
-      }
-    }
-  }
-},
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				padding: 6px 12px;
+				border-radius: 12px;
+				font-size: 13px;
+				color: white;
+				font-weight: 600;
+				cursor: pointer;
+				background-color: rgba(255, 255, 255, 0.08);
+				transition: opacity 0.3s ease, transform 0.2s ease;
+			}
 
-    scales: {
-      x: {
-        ticks: { color: "#d3f8d3" },
-        grid: { color: "rgba(255, 255, 255, 0.05)" }
-      },
-      y: {
-        beginAtZero: true,
-        position: "left",
-        ticks: { color: "#FDFFAE" },
-        grid: { drawOnChartArea: false },
-        title: {
-          display: true,
-          text: "°C / % (Temp, Humidity, Moisture)",
-          color: "#FDFFAE"
-        }
-      },
-      y1: {
-        beginAtZero: true,
-        position: "right",
-        ticks: { color: "#BED754" },
-        grid: { color: "rgba(255, 255, 255, 0.05)" },
-        title: {
-          display: true,
-          text: "Light (lux)",
-          color: "#BED754"
-        }
-      }
-    }
-  }
-});
+			.legend-item:hover {
+				transform: scale(1.05);
+			}
 
-// Legend toggle logic
-document.querySelectorAll(".legend-item").forEach(item => {
-  item.addEventListener("click", function () {
-    const index = +this.dataset.index;
-    const meta = sensorChart.getDatasetMeta(index);
-    meta.hidden = meta.hidden === null ? true : !meta.hidden;
-    this.classList.toggle("inactive");
-    sensorChart.update();
-  });
-});
+			.legend-item.inactive {
+				opacity: 0.4;
+			}
 
-    function getDynamicRanges() {
-      const hour = new Date().getHours();
-      const isDaytime = hour >= 6 && hour < 18; // Example: 6 AM to 6 PM
+			.legend-item .color-bar {
+				width: 12px;
+				height: 12px;
+				border-radius: 2px;
+				display: inline-block;
+			}
 
-      return {
-        light: isDaytime ? { min: 600, max: 900 } : { min: 0, max: 10 }, // Light should be near 0 at night
-        temp: isDaytime ? { min: 22, max: 30 } : { min: 15, max: 25 },   // Allow cooler temps at night
-      };
-    }
+			.glass-table {
+				background: rgba(42, 30, 30, 0.1);
+				border-radius: 1.5rem;
+				padding: 2rem;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+				backdrop-filter: blur(14px);
+				-webkit-backdrop-filter: blur(10px);
+				margin-left: 7em;
+				margin-right: 7em;
+				color: white;
+			}
+			.glass-table table {
+				border-color: rgba(255, 255, 255, 0.159);
+			}
+			.glass-table thead th {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: white;
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+			.glass-table tbody td {
+				background-color: transparent;
+				border-color: rgba(255, 255, 255, 0.2);
+				color: rgb(255, 255, 255);
+			}
+			.glass-button {
+				background: rgba(255, 255, 255, 0.15);
+				backdrop-filter: blur(8px);
+				-webkit-backdrop-filter: blur(8px);
+				border: transparent;
+				color: #fff;
+				border-radius: 12px;
+				padding: 6px 16px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+				transition: background 0.3s ease, transform 0.2s;
+			}
 
-    function getStatus(value, range) {
-      if (value >= range.min && value <= range.max) {
-        return "Ideal";
-      } else if (value >= range.min - 10 && value <= range.max + 10) {
-        return "Fair";
-      } else {
-        return "Poor";
-      }
-    }
+			.glass-button:hover {
+				background: rgba(255, 255, 255, 0.25);
+				/* transform: scale(1.03); */
+			}
 
-    function updateTablePage() {
-      const totalPages = Math.ceil(allData.length / pageSize) || 1;
-      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+			.glass-button:disabled {
+				opacity: 0.4;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<nav
+				class="navbar navbar-expand-lg navbar-light px-4 py-2"
+				style="background-color: rgba(61, 100, 77, 0)"
+			>
+				<a
+					class="navbar-brand fw-bold fs-5 text-white no-hover"
+					href="index.html"
+				>
+					🌱 Sprout Scout
+				</a>
+				<button
+					class="navbar-toggler"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#navbarNav"
+					aria-controls="navbarNav"
+					aria-expanded="false"
+					aria-label="Toggle navigation"
+				>
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div
+					class="collapse navbar-collapse justify-content-end"
+					id="navbarNav"
+				>
+					<ul class="navbar-nav">
+						<li class="nav-item">
+							<a class="nav nav-link text-white" href="#metrics">
+								Plant Status
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav nav-link text-white" href="#readings">
+								Live Sensor Readings
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav nav-link text-white" href="#trends">
+								Sensor Trends
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav nav-link text-white" href="#records">
+								Sensor Records
+							</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</header>
 
-      // Reverse the data first
-      const reversedData = [...allData].reverse();
+		<div class="container py-4">
+			<h2 class="text-center mb-3 mt-5 display-5 matte-text">
+				Plant Monitoring Dashboard
+			</h2>
 
-      const startIdx = (currentPage - 1) * pageSize;
-      const endIdx = startIdx + pageSize;
-      const pageData = reversedData.slice(startIdx, endIdx);
-      const ranges = getDynamicRanges();
+			<!-- Calculated Values FIRST -->
+			<h4 class="mt-1 mb-3 matte-sub-head" id="metrics">Plant Status</h4>
+			<div class="row mt-3">
+				<div class="col-md-4">
+					<div class="card shadow glass-card">
+						<div class="card-body">
+							<h5 class="d-flex justify-content-between align-items-center">
+								<span>Plant Stress</span>
+								<span
+									tabindex="0"
+									data-bs-toggle="tooltip"
+									title="Shows environmental stress signals"
+									style="cursor: pointer"
+								>
+									<img
+										src="https://img.icons8.com/glassmorphism/48/open-book.png"
+										alt="Info"
+										style="
+											width: 1.7em;
+											height: 1.7em;
+											vertical-align: text-bottom;
+										"
+									/>
+								</span>
+							</h5>
+							<p id="stress">Analyzing...</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="card shadow glass-card">
+						<div class="card-body">
+							<h5 class="d-flex justify-content-between align-items-center">
+								<span>Health Index Score</span>
+								<span
+									tabindex="0"
+									data-bs-toggle="tooltip"
+									title="Overall condition score (0–100)"
+									style="cursor: pointer"
+								>
+									<img
+										src="https://img.icons8.com/glassmorphism/48/open-book.png"
+										alt="Info"
+										style="
+											width: 1.7em;
+											height: 1.7em;
+											vertical-align: text-bottom;
+										"
+									/>
+								</span>
+							</h5>
+							<div class="score-box" id="healthIndex">--</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-      dataTableBody.innerHTML = "";
-      pageData.forEach((entry) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
+			<!-- Live Sensor Metrics AFTER -->
+			<h4 class="mt-3 mb-3 matte-sub-head" id="readings">
+				Live Sensor Readings
+			</h4>
+			<div class="row text-center mt-3">
+				<!-- Soil Moisture Card -->
+				<div class="col-md-3">
+					<div
+						class="card shadow text-center glass-card"
+						style="border-left: 2px solid #bed754"
+					>
+						<div class="card-body">
+							<div
+								class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5"
+							>
+								<div>
+									<span class="fw-bold">Soil Moisture</span>
+									<span id="status-moisture" class="glass-badge status-poor">
+										Poor
+									</span>
+								</div>
+
+								<span
+									tabindex="0"
+									data-bs-toggle="tooltip"
+									title="Ideal range: 50–75%"
+									style="cursor: pointer"
+								>
+									<img
+										src="https://img.icons8.com/glassmorphism/48/open-book.png"
+										alt="Info"
+										style="width: 1.7em; height: 1.7em; vertical-align: middle"
+									/>
+								</span>
+							</div>
+						</div>
+						<h2 id="moisture">--%</h2>
+					</div>
+				</div>
+
+				<!-- Light Level Card -->
+				<div class="col-md-3">
+					<div
+						class="card shadow text-center glass-card"
+						style="border-left: 2px solid #fdffae"
+					>
+						<div class="card-body">
+							<div
+								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
+							>
+                <div>
+								  <span class="fw-bold">Light Level</span>
+                
+								  <span id="status-light" class="badge bg-secondary">--</span>
+								  <span
+									tabindex="0"
+									data-bs-toggle="tooltip"
+									data-bs-html="true"
+									title="Light intensity in lux<br>(🌞Daytime Ideal: 600–900)"
+									style="cursor: pointer"
+								  >
+                </div>
+
+									<img
+										src="https://img.icons8.com/glassmorphism/48/open-book.png"
+										alt="Info"
+										style="width: 1.7em; height: 1.7em; vertical-align: middle"
+									/>
+								</span>
+							</div>
+						</div>
+						<h2 id="light">-- lux</h2>
+					</div>
+				</div>
+
+				<!-- Temperature Card -->
+				<div class="col-md-3">
+					<div
+						class="card shadow text-center glass-card"
+						style="border-left: 2px solid #ff8a80"
+					>
+						<div class="card-body">
+							<div
+								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
+							>
+                <div>
+                  <span class="fw-bold">Temperature</span>
+                  <span id="status-temp" class="badge bg-secondary">--</span>
+                  <span
+                    tabindex="0"
+                    data-bs-toggle="tooltip"
+                    data-bs-html="true"
+                    title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C"
+                    style="cursor: pointer"
+                  >
+                </div>
+
+									<img
+										src="https://img.icons8.com/glassmorphism/48/open-book.png"
+										alt="Info"
+										style="width: 1.7em; height: 1.7em; vertical-align: middle"
+									/>
+								</span>
+							</div>
+						</div>
+						<h2 id="temp">--°C</h2>
+					</div>
+				</div>
+
+				<!-- Humidity Card -->
+				<div class="col-md-3">
+					<div
+						class="card shadow text-center glass-card"
+						style="border-left: 2px solid #82b1ff"
+					>
+						<div class="card-body">
+							<div
+								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
+							>
+                <div>
+                  <span class="fw-bold">Humidity</span>
+                  <span id="status-humidity" class="badge bg-secondary">--</span>
+                  <span
+                    tabindex="0"
+                    data-bs-toggle="tooltip"
+                    title="Ideal: 60–80%"
+                    style="cursor: pointer">
+                </div>
+									<img
+										src="https://img.icons8.com/glassmorphism/48/open-book.png"
+										alt="Info"
+										style="width: 1.7em; height: 1.7em; vertical-align: middle"
+									/>
+								</span>
+							</div>
+						</div>
+						<h2 id="humidity">--%</h2>
+					</div>
+				</div>
+			</div>
+
+			<!-- Sensor Trend Chart (Glass Styled) -->
+			<div
+				class="chart-card"
+				style="
+					width: 85%;
+					margin: 0 auto;
+					margin-top: 8em;
+					margin-bottom: 8em;
+					background: rgba(255, 255, 255, 0.05);
+					backdrop-filter: blur(10px);
+					padding: 1rem;
+					border-radius: 1rem;
+					box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+				"
+			>
+				<!-- Chart Canvas -->
+				<div style="position: relative; height: 450px" id="trends">
+					<canvas id="sensorChart"></canvas>
+				</div>
+
+				<!-- Custom Legend -->
+				<div id="custom-legend" class="legend-boxes">
+					<span class="legend-item" data-index="0">
+						<span class="color-bar" style="background-color: #ff8a80"></span>
+						Temperature (°C)
+					</span>
+					<span class="legend-item" data-index="1">
+						<span class="color-bar" style="background-color: #82b1ff"></span>
+						Humidity (%)
+					</span>
+					<span class="legend-item" data-index="2">
+						<span class="color-bar" style="background-color: #bed754"></span>
+						Soil Moisture (%)
+					</span>
+					<span class="legend-item" data-index="3">
+						<span class="color-bar" style="background-color: #fdffae"></span>
+						Light (lux)
+					</span>
+				</div>
+			</div>
+
+			<!-- Historical Data Glass Card -->
+
+			<div class="glass-table mt-5">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h4 class="mb-0" id="records">Plant Data Records</h4>
+
+          <section class="d-flex">
+              <div>
+                <button id="exportExcel" class="glass-button">
+                  <img style="height: 1.2em; width: 1.2em; vertical-align: text-bottom; display: inline;" src="https://img.icons8.com/?size=100&id=x1VwrcUzXIPb&format=png&color=ffffff" alt="ms-excel" />
+                  Export to Excel
+                </button>
+              </div>
+              <div class="pdf-margin">
+                <button id="exportPDF" class="glass-button">
+                  <img style="height: 1.2em; width: 1.2em; vertical-align: text-bottom; display: inline;" src="https://img.icons8.com/?size=100&id=x1VwrcUzXIPb&format=png&color=ffffff" alt="pdf" />
+                  Export to PDF
+                </button>
+              </div>
+            </section>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-striped table-bordered" id="dataTable">
+						<thead>
+							<tr>
+								<th>Time</th>
+								<th>Temp (°C)</th>
+								<th>Humidity (%)</th>
+								<th>Light (lux)</th>
+								<th>Moisture (%)</th>
+								<th>Plant Stress</th>
+								<th>Health Index</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+				<div id="pagination" class="text-center mt-3">
+					<button id="prevPage" class="glass-button me-2" disabled>
+						Previous
+					</button>
+					<span id="pageInfo" class="mx-2 text-white"></span>
+					<button id="nextPage" class="glass-button ms-2" disabled>Next</button>
+				</div>
+			</div>
+		</div>
+
+		<footer>
+			<p class="text-center text-white fw-bold mb-0 py-2">
+				&copy; Sprout Scout 2025. All Rights Reserved.
+			</p>
+		</footer>
+
+		<!-- Scripts -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script>
+			const tooltipTriggerList = [].slice.call(
+				document.querySelectorAll('[data-bs-toggle="tooltip"]')
+			);
+			const tooltipList = tooltipTriggerList.map(
+				(el) => new bootstrap.Tooltip(el)
+			);
+			const tempEl = document.getElementById("temp");
+			const humidityEl = document.getElementById("humidity");
+			const lightEl = document.getElementById("light");
+			const moistureEl = document.getElementById("moisture");
+			const stressEl = document.getElementById("stress");
+			const healthIndexEl = document.getElementById("healthIndex");
+			const dataTableBody = document.querySelector("#dataTable tbody");
+			const prevPageBtn = document.getElementById("prevPage");
+			const nextPageBtn = document.getElementById("nextPage");
+			const pageInfo = document.getElementById("pageInfo");
+			const lowScoreIcon = "images/unhealthy_plant.png"; // e.g. for 0 or 25
+			const highScoreIcon = "images/healthy_plant.png"; // e.g. for 75 or 100
+
+			let daysSincePlanting = null; // fallback default
+			const pageSize = 10;
+			let currentPage = 1;
+			let allData = [];
+
+			function getSensorData() {
+				return {
+					temp: 15 + Math.random() * 25, // 15 to 40 °C
+					humidity: 30 + Math.random() * 60, // 30 to 90%
+					light: 200 + Math.random() * 800, // 200 to 1000 lux
+					moisture: 20 + Math.random() * 80, // 20 to 100%
+					time: getFormattedDateTime(),
+				};
+			}
+			function getFormattedDateTime() {
+				const now = new Date();
+				const options = {
+					year: "numeric",
+					month: "long",
+					day: "numeric",
+					hour: "numeric",
+					minute: "2-digit",
+					hour12: true,
+				};
+				return now.toLocaleString("en-US", options).replace("at", " - ");
+			}
+
+			function calculateForecast(data) {
+				const stress = [];
+				const ranges = getDynamicRanges();
+				if (data.temp > ranges.temp.max)
+					stress.push(
+						`<img src="https://img.icons8.com/glassmorphism/48/hot.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=High Temp"/> High Temp`
+					);
+				if (data.temp < ranges.temp.min)
+					stress.push(
+						`<img src="https://img.icons8.com/glassmorphism/48/cold.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Temp"/> Low Temp`
+					);
+				if (data.moisture < 40)
+					stress.push(
+						`<img src="https://img.icons8.com/glassmorphism/48/ground.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Dry Soil"/> Dry Soil`
+					);
+				if (data.moisture > 80)
+					stress.push(
+						`<img src="https://img.icons8.com/glassmorphism/48/soil.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Overwatering"/> Overwatering`
+					);
+				if (data.light < ranges.light.min)
+					stress.push(
+						`<img src="https://img.icons8.com/glassmorphism/48/clouds.png" style="height: 1.7em; width: 2em; vertical-align: text-bottom; display: inline; alt=Low Light"/> Low Light`
+					);
+
+				const stressText = stress.length
+					? stress.join("<br>")
+					: `<em>No visible stress</em>`;
+
+				const tempScore =
+					data.temp >= ranges.temp.min && data.temp <= ranges.temp.max ? 1 : 0;
+				const humidityScore =
+					data.humidity >= 60 && data.humidity <= 80 ? 1 : 0;
+				const moistureScore =
+					data.moisture >= 50 && data.moisture <= 75 ? 1 : 0;
+				const lightScore =
+					data.light >= ranges.light.min && data.light <= ranges.light.max
+						? 1
+						: 0;
+
+				const healthIndex =
+					((tempScore + humidityScore + moistureScore + lightScore) / 4) * 100;
+
+				return {
+					stressText,
+					healthIndex: healthIndex.toFixed(0),
+				};
+			}
+
+			function setStatus(el, value, goodRange) {
+				const badge = document.getElementById(el);
+				badge.className = "glass-badge ms-2"; // reset
+
+				if (value >= goodRange.min && value <= goodRange.max) {
+					badge.textContent = "Ideal";
+					badge.classList.add("status-ideal");
+				} else if (value >= goodRange.min - 10 && value <= goodRange.max + 10) {
+					badge.textContent = "Fair";
+					badge.classList.add("status-fair");
+				} else {
+					badge.textContent = "Poor";
+					badge.classList.add("status-poor");
+				}
+			}
+
+			const sensorData = {
+				labels: [], // Fill dynamically with timestamps
+				datasets: [
+					{
+						label: "Temp (°C)",
+						data: [],
+						borderColor: "#ff8a80",
+						backgroundColor: "transparent",
+						tension: 0.4,
+						yAxisID: "y1",
+					},
+					{
+						label: "Humidity (%)",
+						data: [],
+						borderColor: "#82b1ff",
+						backgroundColor: "transparent",
+						tension: 0.4,
+						yAxisID: "y1",
+					},
+					{
+						label: "Moisture (%)",
+						data: [],
+						borderColor: "#BED754",
+						backgroundColor: "transparent",
+						tension: 0.4,
+						yAxisID: "y1",
+					},
+					{
+						label: "Light (lux)",
+						data: [],
+						borderColor: "#FDFFAE",
+						backgroundColor: "transparent",
+						tension: 0.4,
+						yAxisID: "y",
+					},
+				],
+			};
+
+			const ctx = document.getElementById("sensorChart").getContext("2d");
+			const sensorChart = new Chart(ctx, {
+				type: "line",
+				data: sensorData,
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: { display: false },
+						title: {
+							display: true,
+							text: "Plant Sensor Trends",
+							color: "#e0f2e0",
+							font: { size: 18, weight: "bold" },
+							padding: { top: 10, bottom: 20 },
+						},
+						tooltip: {
+							backgroundColor: "rgba(162, 123, 92, 0.90)", // frosted glass look
+							titleColor: "#ffffff",
+							bodyColor: "#e0f2e0",
+							// borderColor: 'rgba(255, 255, 255, 0.3)',
+							// borderWidth: 1,
+							cornerRadius: 10,
+							padding: 12,
+							displayColors: false,
+							titleFont: { size: 14, weight: "bold" },
+							bodyFont: { size: 13 },
+							callbacks: {
+								label: function (context) {
+									return `${context.dataset.label}: ${context.formattedValue}`;
+								},
+							},
+						},
+					},
+
+					scales: {
+						x: {
+							ticks: { color: "#d3f8d3" },
+							grid: { color: "rgba(255, 255, 255, 0.05)" },
+						},
+						y: {
+							beginAtZero: true,
+							position: "left",
+							ticks: { color: "#FDFFAE" },
+							grid: { drawOnChartArea: false },
+							title: {
+								display: true,
+								text: "°C / % (Temp, Humidity, Moisture)",
+								color: "#FDFFAE",
+							},
+						},
+						y1: {
+							beginAtZero: true,
+							position: "right",
+							ticks: { color: "#BED754" },
+							grid: { color: "rgba(255, 255, 255, 0.05)" },
+							title: {
+								display: true,
+								text: "Light (lux)",
+								color: "#BED754",
+							},
+						},
+					},
+				},
+			});
+
+			// Legend toggle logic
+			document.querySelectorAll(".legend-item").forEach((item) => {
+				item.addEventListener("click", function () {
+					const index = +this.dataset.index;
+					const meta = sensorChart.getDatasetMeta(index);
+					meta.hidden = meta.hidden === null ? true : !meta.hidden;
+					this.classList.toggle("inactive");
+					sensorChart.update();
+				});
+			});
+
+			function getDynamicRanges() {
+				const hour = new Date().getHours();
+				const isDaytime = hour >= 6 && hour < 18; // Example: 6 AM to 6 PM
+
+				return {
+					light: isDaytime ? { min: 600, max: 900 } : { min: 0, max: 10 }, // Light should be near 0 at night
+					temp: isDaytime ? { min: 22, max: 30 } : { min: 15, max: 25 }, // Allow cooler temps at night
+				};
+			}
+
+			function getStatus(value, range) {
+				if (value >= range.min && value <= range.max) {
+					return "Ideal";
+				} else if (value >= range.min - 10 && value <= range.max + 10) {
+					return "Fair";
+				} else {
+					return "Poor";
+				}
+			}
+
+			function updateTablePage() {
+				const totalPages = Math.ceil(allData.length / pageSize) || 1;
+				currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+				// Reverse the data first
+				const reversedData = [...allData].reverse();
+
+				const startIdx = (currentPage - 1) * pageSize;
+				const endIdx = startIdx + pageSize;
+				const pageData = reversedData.slice(startIdx, endIdx);
+				const ranges = getDynamicRanges();
+
+				dataTableBody.innerHTML = "";
+				pageData.forEach((entry) => {
+					const row = document.createElement("tr");
+					row.innerHTML = `
           <td>${entry.time}</td>
-          <td>${entry.temp.toFixed(1)} - ${getStatus(entry.temp, ranges.temp)}</td>
-          <td>${entry.humidity.toFixed(1)} - ${getStatus(entry.humidity, { min: 60, max: 80 })}</td>
-          <td>${entry.light.toFixed(0)} - ${getStatus(entry.light, ranges.light)}</td>
-          <td>${entry.moisture.toFixed(0)} - ${getStatus(entry.moisture, { min: 50, max: 75 })}</td>
+          <td>${entry.temp.toFixed(1)} - ${getStatus(
+						entry.temp,
+						ranges.temp
+					)}</td>
+          <td>${entry.humidity.toFixed(1)} - ${getStatus(entry.humidity, {
+						min: 60,
+						max: 80,
+					})}</td>
+          <td>${entry.light.toFixed(0)} - ${getStatus(
+						entry.light,
+						ranges.light
+					)}</td>
+          <td>${entry.moisture.toFixed(0)} - ${getStatus(entry.moisture, {
+						min: 50,
+						max: 75,
+					})}</td>
           <td>${entry.stressText}</td>
           <td>${entry.healthIndex}</td>
         `;
-        dataTableBody.appendChild(row);
-      });
+					dataTableBody.appendChild(row);
+				});
 
-    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-    prevPageBtn.disabled = currentPage === 1;
-    nextPageBtn.disabled = currentPage === totalPages;
-}
-    prevPageBtn.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
-        updateTablePage();
-      }
-    });
+				pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+				prevPageBtn.disabled = currentPage === 1;
+				nextPageBtn.disabled = currentPage === totalPages;
+			}
+			prevPageBtn.addEventListener("click", () => {
+				if (currentPage > 1) {
+					currentPage--;
+					updateTablePage();
+				}
+			});
 
-    nextPageBtn.addEventListener("click", () => {
-      const totalPages = Math.ceil(allData.length / pageSize);
-      if (currentPage < totalPages) {
-        currentPage++;
-        updateTablePage();
-      }
-    });
+			nextPageBtn.addEventListener("click", () => {
+				const totalPages = Math.ceil(allData.length / pageSize);
+				if (currentPage < totalPages) {
+					currentPage++;
+					updateTablePage();
+				}
+			});
 
-    function updateDashboard() {
-      const data = getSensorData();
-      const calculated = calculateForecast(data);
-      const ranges = getDynamicRanges();
+			function updateDashboard() {
+				const data = getSensorData();
+				const calculated = calculateForecast(data);
+				const ranges = getDynamicRanges();
 
-      // Update UI
-      tempEl.textContent = `${data.temp.toFixed(1)}°C`;
-      humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
-      lightEl.textContent = `${data.light.toFixed(0)} lux`;
-      moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
-      stressEl.innerHTML = calculated.stressText;
+				// Update UI
+				tempEl.textContent = `${data.temp.toFixed(1)}°C`;
+				humidityEl.textContent = `${data.humidity.toFixed(1)}%`;
+				lightEl.textContent = `${data.light.toFixed(0)} lux`;
+				moistureEl.textContent = `${data.moisture.toFixed(0)}%`;
+				stressEl.innerHTML = calculated.stressText;
 
-      // Determine icon based on score
-      const score = parseInt(calculated.healthIndex);
-      let iconUrl;
-      if (score === 0 || score === 25 || score === 50) {
-        iconUrl = lowScoreIcon;
-      } else if (score === 75 || score === 100) {
-        iconUrl = highScoreIcon;
-      } else {
-        iconUrl = '';
-      }
+				// Determine icon based on score
+				const score = parseInt(calculated.healthIndex);
+				let iconUrl;
+				if (score === 0 || score === 25 || score === 50) {
+					iconUrl = lowScoreIcon;
+				} else if (score === 75 || score === 100) {
+					iconUrl = highScoreIcon;
+				} else {
+					iconUrl = "";
+				}
 
-      healthIndexEl.innerHTML = `
+				healthIndexEl.innerHTML = `
         <div class="d-flex align-items-center justify-content-start gap-5">
           <span>${score} / 100</span>
-          ${iconUrl
-            ? `<img src="${iconUrl}" alt="score icon" class="plant-icon" style="height:3em; width:2.7em; margin-top:-0.2em;" />`
-            : ''
-          }
+          ${
+						iconUrl
+							? `<img src="${iconUrl}" alt="score icon" class="plant-icon" style="height:3em; width:2.7em; margin-top:-0.2em;" />`
+							: ""
+					}
         </div>
       `;
 
-      setStatus("status-moisture", data.moisture, { min: 50, max: 75 });
-      setStatus("status-light", data.light, ranges.light);
-      setStatus("status-temp", data.temp, ranges.temp);
-      setStatus("status-humidity", data.humidity, { min: 60, max: 80 });
+				setStatus("status-moisture", data.moisture, { min: 50, max: 75 });
+				setStatus("status-light", data.light, ranges.light);
+				setStatus("status-temp", data.temp, ranges.temp);
+				setStatus("status-humidity", data.humidity, { min: 60, max: 80 });
 
-      // Store & chart
-      allData.push({
-        time: data.time,
-        ...data,
-        ...calculated,
-      });
+				// Store & chart
+				allData.push({
+					time: data.time,
+					...data,
+					...calculated,
+				});
 
-sensorChart.data.labels.push(data.time);
-sensorChart.data.datasets[0].data.push(data.temp);
-sensorChart.data.datasets[1].data.push(data.humidity);
-sensorChart.data.datasets[2].data.push(data.moisture);
-sensorChart.data.datasets[3].data.push(data.light);
+				sensorChart.data.labels.push(data.time);
+				sensorChart.data.datasets[0].data.push(data.temp);
+				sensorChart.data.datasets[1].data.push(data.humidity);
+				sensorChart.data.datasets[2].data.push(data.moisture);
+				sensorChart.data.datasets[3].data.push(data.light);
 
-if (sensorChart.data.labels.length > 10) {
-  sensorChart.data.labels.shift();
-  sensorChart.data.datasets.forEach((ds) => ds.data.shift());
-}
+				if (sensorChart.data.labels.length > 10) {
+					sensorChart.data.labels.shift();
+					sensorChart.data.datasets.forEach((ds) => ds.data.shift());
+				}
 
-sensorChart.update();
-updateTablePage();
+				sensorChart.update();
+				updateTablePage();
+			}
 
-    }
+			// Initial setup
+			setInterval(updateDashboard, 5000);
+			updateDashboard();
 
-    // Initial setup
-    setInterval(updateDashboard, 5000);
-    updateDashboard();
+			document
+				.querySelectorAll('[data-bs-toggle="tooltip"]')
+				.forEach((el) => new bootstrap.Tooltip(el));
 
-    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => new bootstrap.Tooltip(el));
-</script>
-</body>
+			document
+				.getElementById("exportExcel")
+				.addEventListener("click", function () {
+					const table = document.getElementById("dataTable");
+					const wb = XLSX.utils.book_new();
+					const ws = XLSX.utils.table_to_sheet(table);
+					XLSX.utils.book_append_sheet(wb, ws, "PlantData");
+					XLSX.writeFile(wb, "Plant_Data_Records.xlsx");
+				});
+
+document.getElementById('exportPDF').addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.autoTable({ html: '#dataTable' });
+
+  doc.save('table.pdf');
+});
+		</script>
+	</body>
 </html>
