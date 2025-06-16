@@ -196,13 +196,13 @@
 
 			.glass-table {
 				background: rgba(42, 30, 30, 0.1);
+        width: 100%;
 				border-radius: 1.5rem;
 				padding: 2rem;
 				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 				backdrop-filter: blur(14px);
 				-webkit-backdrop-filter: blur(10px);
-				margin-left: 7em;
-				margin-right: 7em;
+
 				color: white;
 			}
 			.glass-table table {
@@ -271,14 +271,10 @@
 					<ul class="navbar-nav">
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#metrics">
-								Plant Status
+								Dashboard
 							</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav nav-link text-white" href="#readings">
-								Live Sensor Readings
-							</a>
-						</li>
+					
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#trends">
 								Sensor Trends
@@ -286,7 +282,7 @@
 						</li>
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#records">
-								Sensor Records
+								Data Records
 							</a>
 						</li>
 					</ul>
@@ -295,41 +291,38 @@
 		</header>
 
 		<div class="container py-4">
-			<h2 class="text-center mb-3 mt-5 display-5 matte-text">
+			<h2 class="text-center mb-3 mt-5 display-5 matte-text"  id="metrics">
 				Plant Monitoring Dashboard
 			</h2>
 
 			<!-- Calculated Values FIRST -->
-			<h4 class="mt-1 mb-3 matte-sub-head" id="metrics">Plant Status</h4>
+			<h4 class="mt-1 mb-3 matte-sub-head">Plant Status</h4>
 			<div class="row mt-3">
+<div class="col-md-4">
+  <div class="card shadow text-center glass-card" style="border-left: 4px solid #dcdcdc">
+    <div class="card-body">
+      <h5 class="d-flex justify-content-between align-items-center">
+        <span>Plant Stress</span>
+        <span
+          tabindex="0"
+          data-bs-toggle="tooltip"
+          title="Shows environmental stress signals"
+          style="cursor: pointer"
+        >
+          <img
+            src="https://img.icons8.com/glassmorphism/48/open-book.png"
+            alt="Info"
+            style="width: 1.7em; height: 1.7em; vertical-align: middle"
+          />
+        </span>
+      </h5>
+      <p id="stress">Analyzing...</p>
+    </div>
+  </div>
+</div>
+
 				<div class="col-md-4">
-					<div class="card shadow glass-card">
-						<div class="card-body">
-							<h5 class="d-flex justify-content-between align-items-center">
-								<span>Plant Stress</span>
-								<span
-									tabindex="0"
-									data-bs-toggle="tooltip"
-									title="Shows environmental stress signals"
-									style="cursor: pointer"
-								>
-									<img
-										src="https://img.icons8.com/glassmorphism/48/open-book.png"
-										alt="Info"
-										style="
-											width: 1.7em;
-											height: 1.7em;
-											vertical-align: text-bottom;
-										"
-									/>
-								</span>
-							</h5>
-							<p id="stress">Analyzing...</p>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="card shadow glass-card">
+        <div class="card shadow text-center glass-card" style="border-left: 4px solid #dcdcdc">
 						<div class="card-body">
 							<h5 class="d-flex justify-content-between align-items-center">
 								<span>Health Index Score</span>
@@ -361,147 +354,85 @@
 				Live Sensor Readings
 			</h4>
 			<div class="row text-center mt-3">
-				<!-- Soil Moisture Card -->
-				<div class="col-md-3">
-					<div
-						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #bed754"
-					>
-						<div class="card-body">
-							<div
-								class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5"
-							>
-								<div>
-									<span class="fw-bold">Soil Moisture</span>
-									<span id="status-moisture" class="glass-badge status-poor">
-										Poor
-									</span>
-								</div>
+      <!-- Soil Moisture Card -->
+      <div class="col-md-3">
+        <div class="card shadow text-center glass-card" style="border-left: 4px solid #bed754">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5">
+              <div>
+                <span class="fw-bold">Soil Moisture</span>
+                <span id="status-moisture" class="glass-badge status-poor">Poor</span>
+              </div>
+              <span tabindex="0" data-bs-toggle="tooltip" title="Ideal range: 50–75%" style="cursor: pointer">
+                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: middle" />
+              </span>
+            </div>
+          </div>
+          <h2 id="moisture">--%</h2>
+        </div>
+      </div>
 
-								<span
-									tabindex="0"
-									data-bs-toggle="tooltip"
-									title="Ideal range: 50–75%"
-									style="cursor: pointer"
-								>
-									<img
-										src="https://img.icons8.com/glassmorphism/48/open-book.png"
-										alt="Info"
-										style="width: 1.7em; height: 1.7em; vertical-align: middle"
-									/>
-								</span>
-							</div>
-						</div>
-						<h2 id="moisture">--%</h2>
-					</div>
-				</div>
+      <!-- Light Level Card -->
+      <div class="col-md-3">
+        <div class="card shadow text-center glass-card" style="border-left: 4px solid #fdffae">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5">
+              <div>
+                <span class="fw-bold">Light Level</span>
+                <span id="status-light" class="badge bg-secondary">--</span>
+              </div>
+              <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="Light intensity in lux<br>(🌞Daytime Ideal: 600–900)" style="cursor: pointer">
+                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: middle" />
+              </span>
+            </div>
+          </div>
+          <h2 id="light">-- lux</h2>
+        </div>
+      </div>
 
-				<!-- Light Level Card -->
-				<div class="col-md-3">
-					<div
-						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #fdffae"
-					>
-						<div class="card-body">
-							<div
-								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
-							>
-                <div>
-								  <span class="fw-bold">Light Level</span>
-                
-								  <span id="status-light" class="badge bg-secondary">--</span>
-								  <span
-									tabindex="0"
-									data-bs-toggle="tooltip"
-									data-bs-html="true"
-									title="Light intensity in lux<br>(🌞Daytime Ideal: 600–900)"
-									style="cursor: pointer"
-								  >
-                </div>
+      <!-- Temperature Card -->
+      <div class="col-md-3">
+        <div class="card shadow text-center glass-card" style="border-left: 4px solid #ff8a80">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5">
+              <div>
+                <span class="fw-bold">Temperature</span>
+                <span id="status-temp" class="badge bg-secondary">--</span>
+              </div>
+              <span tabindex="0" data-bs-toggle="tooltip" data-bs-html="true" title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C" style="cursor: pointer">
+                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: middle" />
+              </span>
+            </div>
+          </div>
+          <h2 id="temp">--°C</h2>
+        </div>
+      </div>
 
-									<img
-										src="https://img.icons8.com/glassmorphism/48/open-book.png"
-										alt="Info"
-										style="width: 1.7em; height: 1.7em; vertical-align: middle"
-									/>
-								</span>
-							</div>
-						</div>
-						<h2 id="light">-- lux</h2>
-					</div>
-				</div>
+      <!-- Humidity Card -->
+      <div class="col-md-3">
+        <div class="card shadow text-center glass-card" style="border-left: 4px solid #82b1ff">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 fs-5">
+              <div>
+                <span class="fw-bold">Humidity</span>
+                <span id="status-humidity" class="badge bg-secondary">--</span>
+              </div>
+              <span tabindex="0" data-bs-toggle="tooltip" title="Ideal: 60–80%" style="cursor: pointer">
+                <img src="https://img.icons8.com/glassmorphism/48/open-book.png" alt="Info" style="width: 1.7em; height: 1.7em; vertical-align: middle" />
+              </span>
+            </div>
+          </div>
+          <h2 id="humidity">--%</h2>
+        </div>
+      </div>
+    </div>
 
-				<!-- Temperature Card -->
-				<div class="col-md-3">
-					<div
-						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #ff8a80"
-					>
-						<div class="card-body">
-							<div
-								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
-							>
-                <div>
-                  <span class="fw-bold">Temperature</span>
-                  <span id="status-temp" class="badge bg-secondary">--</span>
-                  <span
-                    tabindex="0"
-                    data-bs-toggle="tooltip"
-                    data-bs-html="true"
-                    title="Ideal temp:<br>(🌞Daytime) 22–30°C<br>(🌙Nighttime) 15–25°C"
-                    style="cursor: pointer"
-                  >
-                </div>
-
-									<img
-										src="https://img.icons8.com/glassmorphism/48/open-book.png"
-										alt="Info"
-										style="width: 1.7em; height: 1.7em; vertical-align: middle"
-									/>
-								</span>
-							</div>
-						</div>
-						<h2 id="temp">--°C</h2>
-					</div>
-				</div>
-
-				<!-- Humidity Card -->
-				<div class="col-md-3">
-					<div
-						class="card shadow text-center glass-card"
-						style="border-left: 2px solid #82b1ff"
-					>
-						<div class="card-body">
-							<div
-								class="d-flex justify-content-between fs-5 align-items-center flex-wrap gap-2"
-							>
-                <div>
-                  <span class="fw-bold">Humidity</span>
-                  <span id="status-humidity" class="badge bg-secondary">--</span>
-                  <span
-                    tabindex="0"
-                    data-bs-toggle="tooltip"
-                    title="Ideal: 60–80%"
-                    style="cursor: pointer">
-                </div>
-									<img
-										src="https://img.icons8.com/glassmorphism/48/open-book.png"
-										alt="Info"
-										style="width: 1.7em; height: 1.7em; vertical-align: middle"
-									/>
-								</span>
-							</div>
-						</div>
-						<h2 id="humidity">--%</h2>
-					</div>
-				</div>
-			</div>
 
 			<!-- Sensor Trend Chart (Glass Styled) -->
 			<div
 				class="chart-card"
 				style="
-					width: 85%;
+					width: 100%;
 					margin: 0 auto;
 					margin-top: 8em;
 					margin-bottom: 8em;
@@ -762,8 +693,6 @@
 							backgroundColor: "rgba(162, 123, 92, 0.90)", // frosted glass look
 							titleColor: "#ffffff",
 							bodyColor: "#e0f2e0",
-							// borderColor: 'rgba(255, 255, 255, 0.3)',
-							// borderWidth: 1,
 							cornerRadius: 10,
 							padding: 12,
 							displayColors: false,
@@ -785,23 +714,23 @@
 						y: {
 							beginAtZero: true,
 							position: "left",
-							ticks: { color: "#FDFFAE" },
+							ticks: { color: "#BED754" },
 							grid: { drawOnChartArea: false },
 							title: {
 								display: true,
 								text: "°C / % (Temp, Humidity, Moisture)",
-								color: "#FDFFAE",
+								color: "#BED754",
 							},
 						},
 						y1: {
 							beginAtZero: true,
 							position: "right",
-							ticks: { color: "#BED754" },
+							ticks: { color: "#FDFFAE" },
 							grid: { color: "rgba(255, 255, 255, 0.05)" },
 							title: {
 								display: true,
 								text: "Light (lux)",
-								color: "#BED754",
+								color: "#FDFFAE",
 							},
 						},
 					},
@@ -973,17 +902,17 @@
 					const wb = XLSX.utils.book_new();
 					const ws = XLSX.utils.table_to_sheet(table);
 					XLSX.utils.book_append_sheet(wb, ws, "PlantData");
-					XLSX.writeFile(wb, "Plant_Data_Records.xlsx");
+					XLSX.writeFile(wb, "Plant Data Records.xlsx");
 				});
 
-document.getElementById('exportPDF').addEventListener('click', () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+      document.getElementById('exportPDF').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-  doc.autoTable({ html: '#dataTable' });
+        doc.autoTable({ html: '#dataTable' });
 
-  doc.save('table.pdf');
-});
+        doc.save('Plant Data Records.pdf');
+      });
 		</script>
 	</body>
 </html>
