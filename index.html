@@ -279,7 +279,7 @@
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#readings">Readings</a>
 						</li>
-					
+
 						<li class="nav-item">
 							<a class="nav nav-link text-white" href="#trends">
 								Sensor Trends
@@ -297,38 +297,13 @@
 
 		<div class="container py-4">
 			<h2 class="text-center mb-3 mt-5 display-5 matte-text" id="metrics">
-
 				Plant Monitoring Dashboard
 			</h2>
 
 			<!-- Calculated Values FIRST -->
 			<h4 class="mt-1 mb-3 matte-sub-head">Plant Status</h4>
 			<div class="row mt-3">
-<div class="col-md-4">
-  <div class="card shadow text-center glass-card" style="border-left: 4px solid #dcdcdc">
-    <div class="card-body">
-      <h5 class="d-flex justify-content-between align-items-center">
-        <span>Plant Stress</span>
-        <span
-          tabindex="0"
-          data-bs-toggle="tooltip"
-          title="Shows environmental stress signals"
-          style="cursor: pointer"
-        >
-          <img
-            src="https://img.icons8.com/glassmorphism/48/open-book.png"
-            alt="Info"
-            style="width: 1.7em; height: 1.7em; vertical-align: middle"
-          />
-        </span>
-      </h5>
-      <p id="stress" style="text-align: left;">Analyzing...</p>
-    </div>
-  </div>
-</div>
-
 				<div class="col-md-4">
-
 					<div
 						class="card shadow text-center glass-card"
 						style="border-left: 4px solid #dcdcdc"
@@ -359,7 +334,6 @@
 						class="card shadow text-center glass-card"
 						style="border-left: 4px solid #dcdcdc"
 					>
-
 						<div class="card-body">
 							<h5 class="d-flex justify-content-between align-items-center">
 								<span>Health Index Score</span>
@@ -391,8 +365,6 @@
 				Live Sensor Readings
 			</h4>
 			<div class="row text-center mt-3">
-
-        
 				<!-- Soil Moisture Card -->
 				<div class="col-md-3">
 					<div
@@ -527,7 +499,6 @@
 				</div>
 			</div>
 
-
 			<!-- Toast container for ALL toasts -->
 			<div
 				class="toast-container position-fixed top-0 end-0 p-3"
@@ -582,7 +553,7 @@
 				</div>
 				<!-- Soil Moisture Toast Container -->
 				<div
-					class="toast-container position-fixed top-0 end-0 p-3 d-flex flex-column gap-2"
+					class="toast-container position-fixed top-2 end-0 p-3 d-flex flex-column gap-2"
 				>
 					<!-- LOW Moisture Toast -->
 					<div
@@ -1168,7 +1139,6 @@
 
 				doc.save("Plant Data Records.pdf");
 			});
-
 		</script>
 	</body>
 </html>
